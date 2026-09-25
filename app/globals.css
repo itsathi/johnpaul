@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-ink: #0a0908;
+  --color-coal: #0f0d0b;
+  --color-smoke: #16130f;
+  --color-smoke-2: #1d1914;
+  --color-paper: #ece6da;
+  --color-bone: #cfc7b6;
+  --color-mute: #908876;
+  --color-brass: #bc8a4c;
+  --color-brass-bright: #d9aa6e;
+  --color-line: rgba(236, 230, 218, 0.14);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-brass);
+  color: #0a0908;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Custom cursor: hide native pointer on precision pointers only when JS opts in */
+@media (pointer: fine) {
+  html.custom-cursor,
+  html.custom-cursor * {
+    cursor: none !important;
+  }
+}
+
+/* Film grain, applied to a fixed overlay element */
+.film-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: -50%;
+  z-index: 70;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  animation: grain 9s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -6%); }
+  20% { transform: translate(-14%, 4%); }
+  30% { transform: translate(6%, -12%); }
+  40% { transform: translate(-3%, 13%); }
+  50% { transform: translate(-11%, 6%); }
+  60% { transform: translate(9%, 0%); }
+  70% { transform: translate(-2%, 9%); }
+  80% { transform: translate(5%, -7%); }
+  90% { transform: translate(13%, 2%); }
+}
+
+/* Marquee */
+@keyframes marquee-x {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.animate-marquee-x {
+  animation: marquee-x var(--marquee-duration, 48s) linear infinite;
+}
+
+/* Outline display type */
+.text-outline {
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-paper) 38%, transparent);
+  color: transparent;
+}
+.text-outline-brass {
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-brass) 55%, transparent);
+  color: transparent;
+}
+
+/* Vignette used behind hero / section photography */
+.vignette {
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    transparent 0%,
+    rgba(8, 7, 5, 0.42) 68%,
+    rgba(8, 7, 5, 0.92) 100%
+  );
+}
+
+.reduced-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(188, 138, 76, 0.5) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(188, 138, 76, 0.4);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Kinetic collab marquee hover pause */
+.kinetic-pause:hover .animate-marquee-x {
+  animation-play-state: paused;
 }
