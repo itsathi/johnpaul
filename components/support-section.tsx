@@ -7,7 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import MagneticButton from "./ui/magnetic-button";
 import { support } from "@/content/site";
-import { usePrefersReducedMotion } from "@/lib/media";
+import {
+  useIsPrecisionPointer,
+  usePrefersReducedMotion,
+} from "@/lib/media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,9 +20,10 @@ export default function SupportSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const wordRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
+  const finePointer = useIsPrecisionPointer();
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !finePointer) return;
     const ctx = gsap.context(() => {
       gsap.fromTo(
         wordRef.current,
@@ -38,7 +42,7 @@ export default function SupportSection() {
       );
     }, sectionRef);
     return () => ctx.revert();
-  }, [reduced]);
+  }, [finePointer, reduced]);
 
   return (
     <section

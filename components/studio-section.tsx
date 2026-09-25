@@ -6,7 +6,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import MediaReveal from "./ui/media-reveal";
 import { studioStatement, media } from "@/content/site";
-import { usePrefersReducedMotion } from "@/lib/media";
+import {
+  useIsPrecisionPointer,
+  usePrefersReducedMotion,
+} from "@/lib/media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,9 +17,11 @@ export default function StudioSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
+  const finePointer = useIsPrecisionPointer();
+  const nativeTrack = reduced || !finePointer;
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !finePointer) return;
     const ctx = gsap.context(() => {
       gsap.to(trackRef.current, {
         x: () => -((trackRef.current?.scrollWidth ?? 0) - (sectionRef.current?.clientWidth ?? 0)),
@@ -30,7 +35,7 @@ export default function StudioSection() {
       });
     }, sectionRef);
     return () => ctx.revert();
-  }, [reduced]);
+  }, [finePointer, reduced]);
 
   return (
     <section
@@ -50,8 +55,8 @@ export default function StudioSection() {
 
       {/* horizontal instrument scroll */}
       <div
-        className={`mt-16 md:mt-24 ${reduced ? "overflow-x-auto" : "overflow-hidden"}`}
-        data-lenis-prevent={reduced ? "" : undefined}
+        className={`mt-16 overscroll-x-contain md:mt-24 ${nativeTrack ? "overflow-x-auto" : "overflow-hidden"}`}
+        data-lenis-prevent={nativeTrack ? "" : undefined}
       >
         <div
           ref={trackRef}

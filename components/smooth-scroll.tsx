@@ -12,7 +12,10 @@ import {
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { usePrefersReducedMotion } from "@/lib/media";
+import {
+  useIsPrecisionPointer,
+  usePrefersReducedMotion,
+} from "@/lib/media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,10 +31,11 @@ export const useScrollTo = () => useContext(ScrollContext);
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion();
+  const finePointer = useIsPrecisionPointer();
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !finePointer) return;
 
     const lenis = new Lenis({
       lerp: 0.085,
@@ -50,19 +54,26 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, [reduced]);
+  }, [finePointer, reduced]);
 
   const scrollTo = useCallback(
     (target: string | number, offset = 0) => {
-      if (reduced) {
-        if (typeof target === "number") {
-          window.scrollTo({ top: target, behavior: "auto" });
-        } else {
-          document.querySelector(target)?.scrollIntoView();
-        }
+      const lenis = lenisRef.current;
+      if (lenis) {
+        lenis.scrollTo(target, { offset, duration: 1.4 });
         return;
       }
-      lenisRef.current?.scrollTo(target, { offset, duration: 1.4 });
+
+      const behavior: ScrollBehavior = reduced ? "auto" : "smooth";
+      if (typeof target === "number") {
+        window.scrollTo({ top: target + offset, behavior });
+        return;
+      }
+
+      const element = document.querySelector<HTMLElement>(target);
+      if (!element) return;
+      const top = element.getBoundingClientRect().top + window.scrollY + offset;
+      window.scrollTo({ top, behavior });
     },
     [reduced],
   );

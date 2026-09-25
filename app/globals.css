@@ -93,6 +93,13 @@ body {
   90% { transform: translate(13%, 2%); }
 }
 
+@media (max-width: 767px) {
+  .film-grain {
+    animation: none;
+    opacity: 0.04;
+  }
+}
+
 /* Marquee */
 @keyframes marquee-x {
   from { transform: translate3d(0, 0, 0); }

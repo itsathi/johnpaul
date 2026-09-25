@@ -6,7 +6,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import MediaReveal from "./ui/media-reveal";
 import { journey } from "@/content/site";
-import { usePrefersReducedMotion } from "@/lib/media";
+import {
+  useIsPrecisionPointer,
+  usePrefersReducedMotion,
+} from "@/lib/media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,9 +18,10 @@ export default function CareerTimeline() {
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
+  const finePointer = useIsPrecisionPointer();
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !finePointer) return;
 
     const ctx = gsap.context(() => {
       const items = gsap.utils.toArray<HTMLElement>(".timeline-item");
@@ -72,7 +76,7 @@ export default function CareerTimeline() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [reduced]);
+  }, [finePointer, reduced]);
 
   return (
     <section

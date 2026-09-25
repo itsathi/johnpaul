@@ -26,11 +26,19 @@ export default function Preloader() {
       return;
     }
 
-    document.documentElement.style.overflow = "hidden";
-
     const counter = { value: 0 };
     const root = rootRef.current;
     if (!root) return;
+
+    const touchDevice = window.matchMedia("(pointer: coarse)").matches;
+    const previousOverflow = document.documentElement.style.overflow;
+    let unlocked = false;
+    const unlock = () => {
+      if (unlocked) return;
+      unlocked = true;
+      document.documentElement.style.overflow = previousOverflow;
+    };
+    document.documentElement.style.overflow = "hidden";
 
     const sel = gsap.utils.selector(root);
     const countEl = sel(".pre-count")[0] as HTMLElement | undefined;
@@ -44,10 +52,12 @@ export default function Preloader() {
     const tl = gsap.timeline({
       defaults: { ease: "power4.out" },
       onComplete: () => {
+        unlock();
         markPreloadDone();
         setMounted(false);
       },
     });
+    tl.timeScale(touchDevice ? 1.8 : 1);
 
     tl.fromTo(
       metaEl,
@@ -65,7 +75,7 @@ export default function Preloader() {
         { opacity: 1, y: 0, duration: 0.6 },
       );
 
-    gsap.to(counter, {
+    const counterTween = gsap.to(counter, {
       value: 100,
       duration: 2.15,
       ease: "power2.inOut",
@@ -76,7 +86,7 @@ export default function Preloader() {
       },
     });
 
-    gsap.to(flickers, {
+    const flickerTween = gsap.to(flickers, {
       opacity: (index: number) => (index % 2 ? 0.25 : 0.9),
       duration: 0.09,
       repeat: -1,
@@ -109,7 +119,9 @@ export default function Preloader() {
       .to({}, { duration: 0.15 });
 
     return () => {
-      document.documentElement.style.overflow = "";
+      unlock();
+      counterTween.kill();
+      flickerTween.kill();
       tl.kill();
     };
   }, [reduced]);

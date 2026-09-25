@@ -6,7 +6,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import { kalpana, artist } from "@/content/site";
-import { usePrefersReducedMotion } from "@/lib/media";
+import {
+  useIsPrecisionPointer,
+  usePrefersReducedMotion,
+} from "@/lib/media";
 
 gsap.registerPlugin(ScrollTrigger);
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -15,9 +18,10 @@ export default function KalpanaSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const lettersRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
+  const finePointer = useIsPrecisionPointer();
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !finePointer) return;
     const ctx = gsap.context(() => {
       gsap.fromTo(
         lettersRef.current,
@@ -35,7 +39,7 @@ export default function KalpanaSection() {
       );
     }, sectionRef);
     return () => ctx.revert();
-  }, [reduced]);
+  }, [finePointer, reduced]);
 
   const letters = kalpana.title.split("");
 
