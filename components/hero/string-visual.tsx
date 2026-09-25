@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePrefersReducedMotion, useViewportSize } from "@/lib/media";
+import {
+  useIsDesktop,
+  usePrefersReducedMotion,
+  useViewportSize,
+} from "@/lib/media";
 
 const BRIGHT = "236, 230, 218";
 
@@ -13,9 +17,11 @@ const BRIGHT = "236, 230, 218";
 export default function StringVisual() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const reduced = usePrefersReducedMotion();
+  const desktop = useIsDesktop(768);
   const size = useViewportSize();
 
   useEffect(() => {
+    if (!desktop) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -94,7 +100,7 @@ export default function StringVisual() {
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointer);
     };
-  }, [reduced, size.width, size.height]);
+  }, [desktop, reduced, size.width, size.height]);
 
   return (
     <canvas

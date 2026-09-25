@@ -8,7 +8,7 @@ import Media from "./ui/media";
 import StringVisual from "./hero/string-visual";
 import MagneticButton from "./ui/magnetic-button";
 import { artist, media, nowPlaying } from "@/content/site";
-import { usePrefersReducedMotion } from "@/lib/media";
+import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media";
 import { usePreloaderDone } from "@/lib/preload";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -22,11 +22,12 @@ export default function Hero() {
   const imageRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
+  const desktop = useIsDesktop(768);
   const loaded = usePreloaderDone();
   const stage: Stage = loaded ? "show" : "wait";
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !desktop) return;
     const ctx = gsap.context(() => {
       gsap.to(imageRef.current, {
         scale: 1.3,
@@ -51,7 +52,7 @@ export default function Hero() {
       });
     }, sectionRef);
     return () => ctx.revert();
-  }, [reduced]);
+  }, [desktop, reduced]);
 
   const reveal = (delay: number) => ({
     wait: { opacity: 0, y: 14 },
@@ -70,7 +71,7 @@ export default function Hero() {
     <section
       id="top"
       ref={sectionRef}
-      className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-ink"
+      className="relative h-[100svh] min-h-[34rem] w-full overflow-hidden bg-ink sm:min-h-[620px]"
     >
       <div ref={imageRef} className="absolute inset-0 will-change-transform">
         <Media
@@ -80,14 +81,14 @@ export default function Hero() {
           wixHeight={1208}
           priority
           sizes="100vw"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-[60%_50%] md:object-center"
           placeholderLabel="Hero photograph — John Paul, live on stage"
         />
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-ink/70" />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-transparent to-ink/30" />
-      <div className="vignette absolute inset-0" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,8,0.78)_0%,rgba(10,9,8,0.12)_34%,rgba(10,9,8,0.18)_58%,rgba(10,9,8,0.98)_100%)] md:bg-gradient-to-t md:from-ink md:via-ink/30 md:to-ink/70" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/20 to-transparent md:from-ink/85 md:via-transparent md:to-ink/30" />
+      <div className="vignette absolute inset-0 opacity-70 md:opacity-100" />
 
       <div
         className="absolute inset-y-0 right-0 hidden w-3/5 opacity-80 md:block"
@@ -102,9 +103,9 @@ export default function Hero() {
 
       <div
         ref={contentRef}
-        className="relative z-10 mx-auto flex h-full w-full max-w-[92rem] flex-col justify-end px-6 pb-20 md:px-10 md:pb-24 lg:px-14"
+        className="relative z-10 mx-auto flex h-full w-full max-w-[92rem] flex-col justify-end px-5 pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-[calc(4rem+env(safe-area-inset-bottom))] md:px-10 md:pb-24 lg:px-14"
       >
-        <div className="flex items-center justify-between font-mono text-[0.6rem] uppercase tracking-[0.32em] text-bone/80">
+        <div className="flex items-center justify-center text-center font-mono text-[0.58rem] uppercase tracking-[0.26em] text-bone/80 sm:justify-between sm:text-left md:text-[0.6rem] md:tracking-[0.32em]">
           <motion.span
             variants={reveal(0.05)}
             initial="wait"
@@ -130,20 +131,17 @@ export default function Hero() {
           </motion.span>
         </div>
 
-        <div className="mt-10">
+        <div className="mt-7 md:mt-10">
           <motion.p
             variants={reveal(0.1)}
             initial="wait"
             animate={stage}
-            className="mb-4 font-mono text-[0.65rem] uppercase tracking-[0.4em] text-brass-bright md:mb-6 md:text-[0.72rem]"
+            className="mb-4 max-w-[16rem] font-mono text-[0.6rem] uppercase leading-[1.5] tracking-[0.22em] text-brass-bright md:mb-6 md:max-w-none md:text-[0.72rem] md:leading-normal md:tracking-[0.4em]"
           >
             {artist.descriptor}
           </motion.p>
 
-          <h1
-            className="font-display leading-[0.86] tracking-[-0.02em] text-paper"
-            style={{ fontSize: "clamp(4.2rem, 15.5vw, 15.5rem)" }}
-          >
+          <h1 className="font-display text-[clamp(3.6rem,17vw,7.4rem)] leading-[0.86] tracking-[-0.02em] text-paper md:text-[clamp(4.2rem,15.5vw,15.5rem)]">
             <span className="block overflow-hidden">
               <motion.span
                 className="block will-change-transform"
@@ -171,9 +169,9 @@ export default function Hero() {
             variants={reveal(0.5)}
             initial="wait"
             animate={stage}
-            className="mt-8 flex max-w-xl flex-col gap-2 md:mt-10 md:flex-row md:items-center md:gap-8"
+            className="mt-6 flex max-w-xl flex-col gap-2 md:mt-10 md:flex-row md:items-center md:gap-8"
           >
-            <p className="text-sm leading-relaxed text-bone md:text-base">
+            <p className="text-[0.82rem] leading-relaxed text-bone md:text-base">
               {artist.subDescriptor}
             </p>
             <p className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-mute">
@@ -185,7 +183,7 @@ export default function Hero() {
             variants={reveal(0.68)}
             initial="wait"
             animate={stage}
-            className="mt-10 flex flex-wrap items-center gap-4"
+            className="mt-8 flex w-full max-w-[22rem] flex-col items-stretch gap-3 md:mt-10 md:w-auto md:max-w-none md:flex-row md:flex-wrap md:items-center md:gap-4"
           >
             <MagneticButton
               as="a"
@@ -193,7 +191,7 @@ export default function Hero() {
               target="_blank"
               rel="noopener noreferrer"
               strength={0.35}
-              className="group inline-flex items-center gap-3 rounded-full bg-brass px-9 py-4 font-mono text-[0.66rem] uppercase tracking-[0.28em] text-ink transition-colors hover:bg-brass-bright"
+              className="group inline-flex w-full min-h-12 items-center gap-3 whitespace-nowrap rounded-full bg-brass px-5 py-4 text-center font-mono text-[0.625rem] uppercase tracking-[0.2em] text-ink touch-manipulation transition-colors hover:bg-brass-bright active:bg-brass-bright md:w-auto md:min-h-0 md:whitespace-normal md:px-9 md:text-[0.66rem] md:tracking-[0.28em]"
               ariaLabel="Play the new single, Yosemite's Hathi, on YouTube"
             >
               <PlayGlyph />
@@ -205,7 +203,7 @@ export default function Hero() {
               target="_blank"
               rel="noopener noreferrer"
               strength={0.3}
-              className="inline-flex items-center gap-3 rounded-full border border-paper/30 px-9 py-4 font-mono text-[0.66rem] uppercase tracking-[0.28em] text-paper backdrop-blur-sm transition-colors hover:border-brass hover:text-brass-bright"
+              className="inline-flex w-full min-h-12 items-center gap-3 whitespace-nowrap rounded-full border border-paper/30 px-5 py-4 text-center font-mono text-[0.625rem] uppercase tracking-[0.2em] text-paper backdrop-blur-sm touch-manipulation transition-colors hover:border-brass hover:text-brass-bright active:border-brass active:bg-ink/20 active:text-brass-bright md:w-auto md:min-h-0 md:whitespace-normal md:px-9 md:text-[0.66rem] md:tracking-[0.28em]"
               ariaLabel="Stream Yosemite's Hathi on your favourite service"
             >
               Stream everywhere
