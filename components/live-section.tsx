@@ -8,7 +8,7 @@ import SectionTag from "./ui/section-tag";
 import Media from "./ui/media";
 import MagneticButton from "./ui/magnetic-button";
 import { liveShots, liveStatement } from "@/content/site";
-import { usePrefersReducedMotion } from "@/lib/media";
+import { usePrefersReducedMotion } from "@/lib/media-hooks";
 
 gsap.registerPlugin(ScrollTrigger);
 

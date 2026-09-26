@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import RenderBoundary from "../ui/render-boundary";
 import { wix } from "@/lib/media";
-import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media";
+import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media-hooks";
 import { usePreloaderDone } from "@/lib/preload";
 import { media } from "@/content/site";
 

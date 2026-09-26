@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media";
+import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hooks";
 
 type CursorVariant = "default" | "link" | "view" | "play" | "hide";
 

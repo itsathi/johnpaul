@@ -8,6 +8,10 @@ import ScrollProgress from "@/components/scroll-progress";
 import Preloader from "@/components/preloader";
 import Footer from "@/components/footer";
 import { artist, seo } from "@/content/site";
+import { CommerceProvider } from "@/lib/providers/commerce-provider";
+import { AcademyProvider } from "@/lib/providers/academy-provider";
+import { BookingProvider } from "@/lib/providers/booking-provider";
+import CartDrawer from "@/components/cart-drawer";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -92,15 +96,26 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ArtistStructuredData />
       </head>
       <body>
-        <Preloader />
-        <SmoothScroll>
-          <CustomCursor />
-          <ScrollProgress />
-          <SiteNavigation />
-          <div className="film-grain" aria-hidden />
-          <main>{children}</main>
-          <Footer />
-        </SmoothScroll>
+        {/* Mock providers sit above the shell so the cart drawer, the nav
+            badge and every route share one set of seams. Each is a client
+            boundary wrapping server-rendered children, so the pages stay
+            server components. */}
+        <CommerceProvider>
+          <AcademyProvider>
+            <BookingProvider>
+              <Preloader />
+              <SmoothScroll>
+                <CustomCursor />
+                <ScrollProgress />
+                <SiteNavigation />
+                <div className="film-grain" aria-hidden />
+                <main>{children}</main>
+                <Footer />
+                <CartDrawer />
+              </SmoothScroll>
+            </BookingProvider>
+          </AcademyProvider>
+        </CommerceProvider>
       </body>
     </html>
   );

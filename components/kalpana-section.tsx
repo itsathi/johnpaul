@@ -6,10 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import { kalpana, artist } from "@/content/site";
-import {
-  useIsPrecisionPointer,
-  usePrefersReducedMotion,
-} from "@/lib/media";
+import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hooks";
 
 gsap.registerPlugin(ScrollTrigger);
 const EASE = [0.22, 1, 0.36, 1] as const;

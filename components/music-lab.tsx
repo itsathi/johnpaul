@@ -6,7 +6,7 @@ import { Canvas } from "@react-three/fiber";
 import SectionTag from "./ui/section-tag";
 import RenderBoundary from "./ui/render-boundary";
 import { bindLabInput } from "./webgl/lab-state";
-import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media";
+import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media-hooks";
 
 const MusicScene = dynamic(
   () => import("./webgl/music-scene").then((m) => ({ default: m.default })),

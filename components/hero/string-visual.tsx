@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  useIsDesktop,
-  usePrefersReducedMotion,
-  useViewportSize,
-} from "@/lib/media";
+import { useIsDesktop, usePrefersReducedMotion, useViewportSize } from "@/lib/media-hooks";
 
 const BRIGHT = "236, 230, 218";
 

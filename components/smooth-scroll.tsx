@@ -10,12 +10,10 @@ import {
   type ReactNode,
 } from "react";
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  useIsPrecisionPointer,
-  usePrefersReducedMotion,
-} from "@/lib/media";
+import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hooks";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -95,6 +93,37 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     },
     [reduced],
   );
+
+  /**
+   * A link like `/music#kalpana` crosses a route boundary, so the browser's
+   * native anchor jump happens before the new page exists and Lenis has not
+   * started. Re-run the scroll once the pathname has actually changed and the
+   * section is in the DOM — otherwise every cross-route deep link in the
+   * navigation, the ecosystem and the artist doors lands at the top.
+   */
+  const pathname = usePathname();
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+    let outer = 0;
+    let inner = 0;
+    outer = window.requestAnimationFrame(() => {
+      inner = window.requestAnimationFrame(() => {
+        if (!document.querySelector(hash)) return;
+        const lenis = lenisRef.current;
+        if (lenis) {
+          lenis.scrollTo(hash, { duration: 1.4 });
+          return;
+        }
+        const top = document.querySelector<HTMLElement>(hash)!.getBoundingClientRect().top;
+        window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(outer);
+      window.cancelAnimationFrame(inner);
+    };
+  }, [pathname, reduced]);
 
   const value = useMemo(() => ({ scrollTo }), [scrollTo]);
 

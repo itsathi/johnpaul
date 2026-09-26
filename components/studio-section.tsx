@@ -6,10 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import MediaReveal from "./ui/media-reveal";
 import { studioStatement, media } from "@/content/site";
-import {
-  useIsPrecisionPointer,
-  usePrefersReducedMotion,
-} from "@/lib/media";
+import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hooks";
 
 gsap.registerPlugin(ScrollTrigger);
 

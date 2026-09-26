@@ -39,49 +39,66 @@ export type NavGroup = {
 };
 
 /**
- * Three top-level groups cover all seven destinations the brief asks for
- * (Artist, Music, Sessions, Academy, Gallery, Shop, Contact) without turning
- * the header into a mega-corporate menu.
+ * Four top-level groups cover every destination in the multi-page IA
+ * (Artist, Music, Academy, Work) without turning the header into a
+ * mega-corporate menu.
  *
  * Each group carries its own note and action, so the panel's right-hand column
  * adds context rather than repeating links the group already lists.
+ *
+ * `href` values are real routes. A leading `#` is still supported and is
+ * handled by the smooth-scroll layer, so in-page anchors keep working
+ * alongside route navigation.
  */
 export const navGroups: NavGroup[] = [
   {
     label: "Artist",
     note: "A guitarist, songwriter and producer shaped by the music of Kolkata.",
-    cta: { label: "Hear the music", href: "#listen" },
+    cta: { label: "Hear the music", href: "/music" },
     children: [
-      { label: "Who he is", href: "#work" },
-      { label: "The journey", href: "#journey" },
-      { label: "Instruments", href: "#instruments" },
-      { label: "Kolkata roots", href: "#roots" },
+      { label: "Who he is", href: "/artist" },
+      { label: "The journey", href: "/artist/journey" },
+      { label: "Instruments", href: "/artist#instruments" },
+      { label: "Kolkata roots", href: "/artist#roots" },
+      { label: "The studio", href: "/artist#studio" },
     ],
   },
   {
     label: "Music",
     note: "Originals, the Kalpana project, live sets and everything in between.",
-    cta: { label: "Start listening", href: "#listen" },
+    cta: { label: "Start listening", href: "/music#listen" },
     children: [
-      { label: "Now playing", href: "#listen" },
-      { label: "Releases", href: "#releases" },
-      { label: "Kalpana", href: "#kalpana" },
-      { label: "Live & touring", href: "#live" },
-      { label: "Collaborations", href: "#collab" },
-      { label: "The sound lab", href: "#lab" },
+      { label: "Now playing", href: "/music#listen" },
+      { label: "Releases", href: "/music#releases" },
+      { label: "Kalpana", href: "/music/kalpana" },
+      { label: "Yosemite's Hathi", href: "/music/yosemites-hathi" },
+      { label: "Live & touring", href: "/music#live" },
+      { label: "Collaborations", href: "/music#collab" },
+    ],
+  },
+  {
+    label: "Academy",
+    note: "One-to-one work, small classes and ongoing access — craft handed over properly.",
+    cta: { label: "Start learning", href: "/academy" },
+    children: [
+      { label: "Academy", href: "/academy" },
+      { label: "Private lessons", href: "/academy/lessons" },
+      { label: "Classes", href: "/academy/classes" },
+      { label: "Making Tones", href: "/academy/classes/making-tones" },
+      { label: "Membership", href: "/academy/membership" },
     ],
   },
   {
     label: "Work",
-    note: "Bookings, lessons, production and the practical side of the practice.",
-    cta: { label: "Book a session", href: "#sessions" },
+    note: "Bookings, sessions, production and the practical side of the practice.",
+    cta: { label: "Book a session", href: "/sessions/book" },
     children: [
-      { label: "Sessions", href: "#sessions" },
-      { label: "Academy", href: "#academy" },
-      { label: "Studio & production", href: "#studio" },
-      { label: "Gallery", href: "#gallery" },
-      { label: "Shop", href: "#shop" },
-      { label: "Contact", href: "#contact" },
+      { label: "Sessions", href: "/sessions" },
+      { label: "Request a session", href: "/sessions/book" },
+      { label: "Gallery", href: "/gallery" },
+      { label: "Shop", href: "/shop" },
+      { label: "Cart", href: "/cart" },
+      { label: "Contact", href: "/contact" },
     ],
   },
 ];
@@ -100,6 +117,7 @@ export type Pillar = {
   children: NavChild[];
 };
 
+/* ================================================================== */
 export const ecosystem = {
   kicker: "The platform",
   headline: ["One artist.", "Six sides.", "One place."] as string[],
@@ -117,13 +135,13 @@ export const ecosystem = {
       key: "music",
       title: "Music",
       line: "Independent releases, the album Kalpana, and everything recorded with other artists.",
-      href: "#listen",
+      href: "/music",
       source: "documented",
       children: [
-        { label: "Now playing", href: "#listen" },
-        { label: "Releases", href: "#releases" },
-        { label: "Kalpana", href: "#kalpana" },
-        { label: "Collaborations", href: "#collab" },
+        { label: "Now playing", href: "/music#listen" },
+        { label: "Releases", href: "/music#releases" },
+        { label: "Kalpana", href: "/music/kalpana" },
+        { label: "Collaborations", href: "/music#collab" },
       ],
     },
     {
@@ -131,13 +149,13 @@ export const ecosystem = {
       key: "artist",
       title: "Artist",
       line: "Who he is, the years that made him, and the instruments he answers to.",
-      href: "#work",
+      href: "/artist",
       source: "documented",
       children: [
-        { label: "The artist", href: "#work" },
-        { label: "The journey", href: "#journey" },
-        { label: "Instruments", href: "#instruments" },
-        { label: "Roots", href: "#roots" },
+        { label: "The artist", href: "/artist" },
+        { label: "The journey", href: "/artist/journey" },
+        { label: "Instruments", href: "/artist#instruments" },
+        { label: "Roots", href: "/artist#roots" },
       ],
     },
     {
@@ -145,12 +163,12 @@ export const ecosystem = {
       key: "sessions",
       title: "Sessions",
       line: "Book him to record — guitars, strings, arrangement and production.",
-      href: "#sessions",
+      href: "/sessions",
       source: "documented",
       children: [
-        { label: "Book a session", href: "#sessions" },
-        { label: "What he plays", href: "#instruments" },
-        { label: "Studio & production", href: "#studio" },
+        { label: "Request a session", href: "/sessions/book" },
+        { label: "What he plays", href: "/artist#instruments" },
+        { label: "Studio & production", href: "/sessions" },
       ],
     },
     {
@@ -158,12 +176,12 @@ export const ecosystem = {
       key: "academy",
       title: "Academy",
       line: "Private lessons, premium classes and ongoing access for players who want to go further.",
-      href: "#academy",
+      href: "/academy",
       source: "demo",
       children: [
-        { label: "Private lessons", href: "#academy-lessons" },
-        { label: "Premium classes", href: "#academy-classes" },
-        { label: "Subscriptions", href: "#academy-subscriptions" },
+        { label: "Private lessons", href: "/academy/lessons" },
+        { label: "Classes", href: "/academy/classes" },
+        { label: "Membership", href: "/academy/membership" },
       ],
     },
     {
@@ -171,12 +189,12 @@ export const ecosystem = {
       key: "gallery",
       title: "Gallery",
       line: "The archive — live rooms, touring, the studio and everything behind it.",
-      href: "#gallery",
+      href: "/gallery",
       source: "documented",
       children: [
-        { label: "Live", href: "#gallery" },
-        { label: "Studio", href: "#gallery" },
-        { label: "Collaborations", href: "#gallery" },
+        { label: "Live", href: "/gallery?f=live" },
+        { label: "Studio", href: "/gallery?f=studio" },
+        { label: "Collaborations", href: "/gallery?f=collabs" },
       ],
     },
     {
@@ -184,12 +202,12 @@ export const ecosystem = {
       key: "shop",
       title: "Shop",
       line: "Artist merchandise, physical releases and limited editions.",
-      href: "#shop",
+      href: "/shop",
       source: "demo",
       children: [
-        { label: "Apparel", href: "#shop" },
-        { label: "Music", href: "#shop" },
-        { label: "Limited editions", href: "#shop" },
+        { label: "Apparel", href: "/shop#apparel" },
+        { label: "Music", href: "/shop#music" },
+        { label: "Limited editions", href: "/shop#limited" },
       ],
     },
   ] satisfies Pillar[],
@@ -506,10 +524,30 @@ export const shop = {
     "Apparel, physical releases and limited editions. The catalogue below is a demonstration of the storefront experience — the layout is built to be driven by a real commerce backend without redesigning the frontend.",
   categories: [
     { key: "all", label: "Everything" },
-    { key: "apparel", label: "Apparel" },
-    { key: "music", label: "Music" },
-    { key: "physical", label: "Physical" },
-    { key: "limited", label: "Limited editions" },
+    {
+      key: "music",
+      no: "01",
+      label: "Music",
+      note: "Physical editions of Kalpana — a record released in chapters wants a physical object that gathers them.",
+    },
+    {
+      key: "apparel",
+      no: "02",
+      label: "Apparel",
+      note: "Cut for the stage and the studio. Sizing, fabric and graphics are all still to be decided with the artist.",
+    },
+    {
+      key: "physical",
+      no: "03",
+      label: "Physical",
+      note: "The disc slot alongside the vinyl, held for the same reason.",
+    },
+    {
+      key: "limited",
+      no: "04",
+      label: "Limited editions",
+      note: "Numbered prints, posters and the studio notebook. Edition sizes are undecided, so nothing is for sale yet.",
+    },
   ],
   cta: {
     label: "Enquire about the catalogue",

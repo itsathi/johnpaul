@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { artist, contact } from "@/content/site";
 import { navGroups } from "@/content/platform";
+import { useCart } from "@/lib/providers/commerce-provider";
 import { useScrollTo } from "./smooth-scroll";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -20,6 +23,8 @@ const WIPE = [0.83, 0, 0.17, 1] as const;
  */
 export default function SiteNavigation() {
   const { scrollTo } = useScrollTo();
+  const pathname = usePathname();
+  const { count, open: openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -36,11 +41,22 @@ export default function SiteNavigation() {
     lastScroll.current = v;
   });
 
+  /* Hashes stay inside the page and keep the Lenis easing; everything else is
+     a real route handled by next/link. One rule, so the header never has to
+     know which kind of destination it is pointing at. */
   const go = (href: string) => {
-    const wasOpen = open;
     setOpen(false);
     setOpenGroup(null);
-    window.setTimeout(() => scrollTo(href, 0), wasOpen ? 420 : 0);
+    if (href.startsWith("#")) {
+      window.setTimeout(() => scrollTo(href, 0), 0);
+    }
+  };
+
+  /** True when `href` resolves to the route currently being viewed. */
+  const isCurrent = (href: string) => {
+    if (!href.startsWith("/")) return false;
+    const [path] = href.split("#");
+    return path === pathname;
   };
 
   /* Escape closes an open group and returns focus to its trigger. */
@@ -76,11 +92,11 @@ export default function SiteNavigation() {
         }`}
       >
         <nav className="mx-auto flex h-16 w-full max-w-[92rem] items-center justify-between px-6 md:h-[4.5rem] md:px-10 lg:px-14">
-          <button
-            type="button"
-            onClick={() => go("#top")}
+          <Link
+            href="/"
+            data-cursor="link"
             className="group flex items-baseline gap-3"
-            aria-label="Back to top"
+            aria-label={`${artist.name} — home`}
           >
             <span className="font-display text-xl tracking-tight text-paper">
               {artist.name}
@@ -88,7 +104,7 @@ export default function SiteNavigation() {
             <span className="hidden font-mono text-[0.55rem] uppercase tracking-[0.3em] text-mute transition-colors group-hover:text-brass-bright md:inline">
               Kolkata
             </span>
-          </button>
+          </Link>
 
           {/* ---- desktop groups ---- */}
           <div className="hidden items-center gap-7 lg:flex">
@@ -105,7 +121,9 @@ export default function SiteNavigation() {
                   onMouseEnter={() => setOpenGroup(group.label)}
                   onClick={() => setOpenGroup(isOn ? null : group.label)}
                   className={`relative font-mono text-[0.62rem] uppercase tracking-[0.3em] transition-colors ${
-                    isOn ? "text-paper" : "text-bone hover:text-paper"
+                    isOn || group.children.some((c) => isCurrent(c.href))
+                      ? "text-paper"
+                      : "text-bone hover:text-paper"
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
@@ -136,9 +154,8 @@ export default function SiteNavigation() {
               );
             })}
 
-            <button
-              type="button"
-              onClick={() => go("#sessions")}
+            <Link
+              href="/sessions/book"
               data-cursor="link"
               className="font-mono text-[0.62rem] uppercase tracking-[0.28em] text-ink"
               style={{ background: "linear-gradient(120deg, #dcac73, #c08b4c)" }}
@@ -146,7 +163,31 @@ export default function SiteNavigation() {
               <span className="block px-4 py-2 transition-transform duration-300 hover:scale-[1.04]">
                 Book a session
               </span>
-            </button>
+            </Link>
+
+            {/* Cart entry — only appears once there is something in it. */}
+            {count > 0 ? (
+              <button
+                type="button"
+                onClick={openCart}
+                data-cursor="link"
+                aria-label={`Open cart, ${count} item${count === 1 ? "" : "s"}`}
+                className="relative flex h-9 w-9 items-center justify-center border border-line text-bone transition-colors hover:border-brass/60 hover:text-brass-bright"
+              >
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden>
+                  <path
+                    d="M1.5 1.5h1.6l1.7 8.2h6.4l1.7-5.9H4.2"
+                    stroke="currentColor"
+                    strokeWidth="1.1"
+                  />
+                  <circle cx="6" cy="12.4" r="1.1" fill="currentColor" />
+                  <circle cx="11.4" cy="12.4" r="1.1" fill="currentColor" />
+                </svg>
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center bg-brass px-1 font-mono text-[0.5rem] text-ink">
+                  {count}
+                </span>
+              </button>
+            ) : null}
           </div>
 
           <button
@@ -183,23 +224,44 @@ export default function SiteNavigation() {
             >
               <div className="mx-auto grid w-full max-w-[92rem] grid-cols-[1fr_auto] items-start gap-10 px-14 py-9">
                 <ul className="grid grid-cols-2 gap-x-12 gap-y-1 xl:grid-cols-3">
-                  {active.children.map((child, i) => (
-                    <li key={child.href}>
-                      <button
-                        type="button"
-                        onClick={() => go(child.href)}
-                        data-cursor="link"
-                        className="group flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors"
-                      >
+                  {active.children.map((child, i) => {
+                    const inner = (
+                      <>
                         <span className="font-mono text-[0.55rem] tracking-[0.3em] text-brass">
                           {String(i + 1).padStart(2, "0")}
                         </span>
                         <span className="font-display text-xl leading-none tracking-tight text-bone transition-colors duration-300 group-hover:text-brass-bright">
                           {child.label}
                         </span>
-                      </button>
-                    </li>
-                  ))}
+                      </>
+                    );
+                    const cls =
+                      "group flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left transition-colors";
+                    return (
+                      <li key={child.href}>
+                        {child.href.startsWith("#") ? (
+                          <button
+                            type="button"
+                            onClick={() => go(child.href)}
+                            data-cursor="link"
+                            className={cls}
+                          >
+                            {inner}
+                          </button>
+                        ) : (
+                          <Link
+                            href={child.href}
+                            onClick={() => setOpenGroup(null)}
+                            data-cursor="link"
+                            className={cls}
+                            aria-current={isCurrent(child.href) ? "page" : undefined}
+                          >
+                            {inner}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 <div className="flex w-64 flex-col gap-5 border-l border-line pl-10">
@@ -209,9 +271,9 @@ export default function SiteNavigation() {
                   <p className="font-display text-lg leading-snug text-bone/80">
                     {active.note}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => go(active.cta.href)}
+                  <Link
+                    href={active.cta.href}
+                    onClick={() => setOpenGroup(null)}
                     data-cursor="link"
                     className="self-start font-mono text-[0.55rem] uppercase tracking-[0.28em] text-ink"
                   >
@@ -221,7 +283,7 @@ export default function SiteNavigation() {
                     >
                       {active.cta.label}
                     </span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -262,18 +324,32 @@ export default function SiteNavigation() {
                     </span>
                   </div>
 
-                  {group.children.map((child) => (
-                    <button
-                      key={`${group.label}-${child.href}`}
-                      type="button"
-                      onClick={() => go(child.href)}
-                      className="flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left"
-                    >
-                      <span className="font-display text-2xl leading-none tracking-tight text-bone">
-                        {child.label}
-                      </span>
-                    </button>
-                  ))}
+                  {group.children.map((child) =>
+                    child.href.startsWith("#") ? (
+                      <button
+                        key={`${group.label}-${child.href}`}
+                        type="button"
+                        onClick={() => go(child.href)}
+                        className="flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left"
+                      >
+                        <span className="font-display text-2xl leading-none tracking-tight text-bone">
+                          {child.label}
+                        </span>
+                      </button>
+                    ) : (
+                      <Link
+                        key={`${group.label}-${child.href}`}
+                        href={child.href}
+                        onClick={() => setOpen(false)}
+                        aria-current={isCurrent(child.href) ? "page" : undefined}
+                        className="flex w-full items-baseline gap-4 border-b border-line py-3.5 text-left"
+                      >
+                        <span className="font-display text-2xl leading-none tracking-tight text-bone">
+                          {child.label}
+                        </span>
+                      </Link>
+                    ),
+                  )}
                 </motion.div>
               ))}
             </div>
@@ -297,6 +373,29 @@ export default function SiteNavigation() {
                     {s.label}
                   </a>
                 ))}
+              </div>
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5">
+                <Link
+                  href="/cart"
+                  onClick={() => setOpen(false)}
+                  className="font-mono text-[0.58rem] uppercase tracking-[0.24em] text-bone"
+                >
+                  Cart{count > 0 ? ` (${count})` : ""}
+                </Link>
+                <Link
+                  href="/studio"
+                  onClick={() => setOpen(false)}
+                  className="font-mono text-[0.58rem] uppercase tracking-[0.24em] text-bone"
+                >
+                  Studio
+                </Link>
+                <Link
+                  href="/contact"
+                  onClick={() => setOpen(false)}
+                  className="font-mono text-[0.58rem] uppercase tracking-[0.24em] text-bone"
+                >
+                  Contact
+                </Link>
               </div>
               <p className="mt-4 font-mono text-[0.55rem] uppercase tracking-[0.24em] text-mute">
                 {artist.location}

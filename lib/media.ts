@@ -1,5 +1,3 @@
-import { useSyncExternalStore } from "react";
-
 /**
  * Builds a sized/sharpenable URL for a stable `static.wixstatic.com` media id,
  * e.g. "84283f_abc…~mv2.jpg". Width-scaled, queue-sharpened, avif-encoded.
@@ -10,58 +8,17 @@ export function wix(id: string, width: number, height?: number): string {
   return `https://static.wixstatic.com/media/${file}/v1/fit/w_${width},h_${h},al_c,q_85,enc_avif,quality_auto/${file}`;
 }
 
-/** SSR-safe, reactive media-query hook (avoids hydration mismatch). */
-export function useMediaQuery(query: string): boolean {
-  return useSyncExternalStore(
-    (onChange) => {
-      const mq = window.matchMedia(query);
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
-  );
+/**
+ * Turns a YouTube share/watch URL into the embeddable form an iframe needs.
+ * Accepts `youtu.be/<id>`, `watch?v=<id>` and already-embedded URLs, and
+ * returns the input untouched for anything else (Vimeo, a direct file).
+ */
+export function youtubeEmbed(href: string): string {
+  const youtu = href.match(/^https?:\/\/(?:www\.)?youtu\.be\/([\w-]+)/);
+  if (youtu) return `https://www.youtube.com/embed/${youtu[1]}`;
+  const watch = href.match(/[?&]v=([\w-]+)/);
+  if (watch) return `https://www.youtube.com/embed/${watch[1]}`;
+  const embed = href.match(/^https?:\/\/(?:www\.)?youtube\.com\/embed\/([\w-]+)/);
+  if (embed) return `https://www.youtube.com/embed/${embed[1]}`;
+  return href;
 }
-
-/** SSR-safe, media-query based reduced-motion check. */
-export function usePrefersReducedMotion(): boolean {
-  return useMediaQuery("(prefers-reduced-motion: reduce)");
-}
-
-/** True only for fine pointers (mouse/trackpad) — gating cursor & parallax. */
-export function useIsPrecisionPointer(): boolean {
-  return useMediaQuery("(hover: hover) and (pointer: fine)");
-}
-
-/** Whether the desktop layout is active (min-width gauge). */
-export function useIsDesktop(breakpoint = 1024): boolean {
-  return useMediaQuery(`(min-width: ${breakpoint}px)`);
-}
-
-let cachedSize = { width: 0, height: 0 };
-
-/* A stable server snapshot. Returning a fresh object from getServerSnapshot
-   makes useSyncExternalStore believe the store changed on every read, which
-   React reports as an infinite-loop risk. */
-const SERVER_SIZE: { width: number; height: number } = { width: 0, height: 0 };
-
-/** Reactive viewport size that stays referentially stable between changes. */
-export function useViewportSize(): { width: number; height: number } {
-  const subscribe = (onChange: () => void) => {
-    window.addEventListener("resize", onChange);
-    return () => window.removeEventListener("resize", onChange);
-  };
-  const getSnapshot = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    if (width !== cachedSize.width || height !== cachedSize.height) {
-      cachedSize = { width, height };
-    }
-    return cachedSize;
-  };
-  return useSyncExternalStore(subscribe, getSnapshot, () => SERVER_SIZE);
-}
-
-/** Clamp a number between bounds. */
-export const clamp = (v: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, v));

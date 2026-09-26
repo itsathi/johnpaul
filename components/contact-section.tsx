@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
 import MagneticButton from "./ui/magnetic-button";
@@ -19,10 +20,10 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  * the page ends by asking for something rather than by listing ways to reach him.
  */
 const LADDER = [
-  { label: "Book a Session", href: "#sessions", tier: "primary" },
-  { label: "Join the Academy", href: "#academy", tier: "primary" },
-  { label: "Hear the music", href: "#listen", tier: "outline" },
-  { label: "Book John to play", href: "#live", tier: "outline" },
+  { label: "Request a Session", href: "/sessions/book", tier: "primary" },
+  { label: "Join the Academy", href: "/academy", tier: "primary" },
+  { label: "Hear the music", href: "/music", tier: "outline" },
+  { label: "Book John to play", href: "/sessions", tier: "outline" },
 ] as const;
 
 function HeadingWord({ children, delay = 0 }: { children: string; delay?: number }) {
@@ -43,6 +44,14 @@ function HeadingWord({ children, delay = 0 }: { children: string; delay?: number
 
 export default function ContactSection() {
   const { scrollTo } = useScrollTo();
+  const router = useRouter();
+
+  /* Hashes scroll in place; routes are pushed. The contact ladder is the one
+     place the homepage points outward, so it has to know the difference. */
+  const go = (href: string) => {
+    if (href.startsWith("#")) scrollTo(href);
+    else router.push(href);
+  };
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -88,8 +97,8 @@ export default function ContactSection() {
             >
               <MagneticButton
                 strength={0.4}
-                onClick={() => scrollTo(item.href)}
-                ariaLabel={`${item.label} — go to that section`}
+                onClick={() => go(item.href)}
+                ariaLabel={item.label}
                 className={`font-mono uppercase tracking-[0.28em] text-ink ${
                   i === 0 ? "text-[0.68rem]" : "text-[0.62rem] opacity-90"
                 }`}
@@ -112,7 +121,7 @@ export default function ContactSection() {
               <button
                 key={item.href}
                 type="button"
-                onClick={() => scrollTo(item.href)}
+                onClick={() => go(item.href)}
                 data-cursor="link"
                 className="group inline-flex min-h-12 items-center gap-3 rounded-full border border-paper/30 px-6 py-3 text-left font-mono text-[0.6rem] uppercase tracking-[0.22em] text-paper transition-colors hover:border-brass hover:text-brass-bright"
               >

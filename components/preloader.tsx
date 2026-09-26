@@ -1,30 +1,73 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { markPreloadDone } from "@/lib/preload";
-import { usePrefersReducedMotion } from "@/lib/media";
+import { usePrefersReducedMotion } from "@/lib/media-hooks";
 
 const LINES = [
   { text: "JOHN", italic: false },
   { text: "PAUL", italic: true },
 ];
 
+const SEEN_KEY = "jpshop.intro.v1";
+const SEEN_EVENT = "jpshop:intro-seen";
+
+/**
+ * "Has the intro already played this session?" is external state, so it is read
+ * as a store rather than assigned inside an effect: the server snapshot is
+ * `false`, and after hydration React re-renders once with the real answer. That
+ * keeps the first paint identical on both sides and still means returning to
+ * `/` never replays four seconds of theatre.
+ */
+function subscribeSeen(listener: () => void) {
+  window.addEventListener(SEEN_EVENT, listener);
+  return () => window.removeEventListener(SEEN_EVENT, listener);
+}
+
+function readSeen(): boolean {
+  try {
+    return window.sessionStorage.getItem(SEEN_KEY) === "1";
+  } catch {
+    /* sessionStorage unavailable — treat as unseen so the intro still shows. */
+    return false;
+  }
+}
+
+function markSeen() {
+  try {
+    window.sessionStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    /* Ignore. */
+  }
+}
+
 /**
  * Cinematic intro: big name breaks in through masks, a counter runs to 100,
  * then the whole page lifts. Fires `markPreloadDone()` so the hero entrance
  * starts exactly as the curtain comes up. Skipped for reduced-motion users.
+ *
+ * Two guards keep it correct in a multi-page site: it only runs on the
+ * homepage (it is the cinematic *entry point*, not a per-route delay) and only
+ * once per browser session, so returning to `/` does not replay four seconds
+ * of theatre mid-demo. On every other route it resolves instantly and marks
+ * the preloader done, so gated content such as the halftone still reveals.
  */
 export default function Preloader() {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [mounted, setMounted] = useState(true);
   const reduced = usePrefersReducedMotion();
+  const alreadySeen = useSyncExternalStore(subscribeSeen, readSeen, () => false);
 
   useEffect(() => {
-    if (reduced) {
+    if (reduced || !isHome || alreadySeen) {
       markPreloadDone();
       return;
     }
+    markSeen();
 
     const counter = { value: 0 };
     const root = rootRef.current;
@@ -124,9 +167,9 @@ export default function Preloader() {
       flickerTween.kill();
       tl.kill();
     };
-  }, [reduced]);
+  }, [reduced, isHome, alreadySeen]);
 
-  if (reduced) return null;
+  if (reduced || !isHome || alreadySeen) return null;
 
   if (!mounted) return null;
 

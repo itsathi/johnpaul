@@ -8,10 +8,7 @@ import SectionTag from "./ui/section-tag";
 import MagneticButton from "./ui/magnetic-button";
 import { support } from "@/content/site";
 import { useScrollTo } from "./smooth-scroll";
-import {
-  useIsPrecisionPointer,
-  usePrefersReducedMotion,
-} from "@/lib/media";
+import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hooks";
 
 gsap.registerPlugin(ScrollTrigger);
 

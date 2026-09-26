@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
 import Media from "./ui/media";
@@ -19,7 +20,7 @@ const disciplines = [
   {
     word: "Artist",
     caption: "His own records — Kalpana",
-    target: "#kalpana",
+    href: "/music#kalpana",
     src: media.hero,
     alt: "John Paul performing on stage",
     line: "Independent releases and the album Kalpana, written, arranged and produced by John.",
@@ -27,7 +28,7 @@ const disciplines = [
   {
     word: "Session",
     caption: "Records, films, jingles",
-    target: "#sessions",
+    href: "/sessions",
     src: media.guitarClose,
     alt: "Guitar in close detail during a studio session",
     line: "Studio guitars and strings for songs, films and jingles — the first call for a record that needs a voice.",
@@ -35,7 +36,7 @@ const disciplines = [
   {
     word: "Live",
     caption: "Tours, arenas, festivals",
-    target: "#live",
+    href: "/music#live",
     src: liveShots[0].id,
     alt: "John Paul performing during Arijit Singh Live, Kolkata",
     line: "Ten years across India's biggest stages, where every solo has to speak in front of ten thousand people.",
@@ -43,7 +44,7 @@ const disciplines = [
   {
     word: "Touring",
     caption: "His own band, his own stage",
-    target: "#live",
+    href: "/artist/journey",
     src: liveShots[5].id,
     alt: "John Paul performing on tour around the country",
     line: "John Paul Live — a sold-out headline night in Kolkata with his own band.",
@@ -51,7 +52,7 @@ const disciplines = [
   {
     word: "Production",
     caption: "Arranging, programming",
-    target: "#studio",
+    href: "#studio",
     src: media.studioDesk,
     alt: "Studio desk during a recording session",
     line: "Songs built from the ground up — programming, arranging and producing, including signature acoustic-drum programming.",
@@ -59,7 +60,7 @@ const disciplines = [
   {
     word: "Teaching",
     caption: "Passing the craft on",
-    target: "#academy",
+    href: "/academy",
     src: media.daddario,
     alt: "Strings and folk instruments from the Making Tones workshop series",
     line: "The Making Tones workshop series, private lessons and classes — the craft handed on rather than kept.",
@@ -67,7 +68,7 @@ const disciplines = [
   {
     word: "Collaborating",
     caption: "With artists across India",
-    target: "#collab",
+    href: "/music#collab",
     src: collaborations[0].media,
     alt: `John Paul performing with ${collaborations[0].name}`,
     line: "Arijit Singh Live, The Raghu Dixit Project, Nikhita Gandhi Live and a call list of records and stages.",
@@ -76,6 +77,20 @@ const disciplines = [
 
 export default function ArtistIntro() {
   const { scrollTo } = useScrollTo();
+  const router = useRouter();
+
+  /**
+   * A door is either an anchor on this page (the studio section) or a route the
+   * discipline moved to. Both the navigation and the ecosystem now live on their
+   * own pages, so a hash that no longer exists here would be a dead click.
+   */
+  const open = (href: string) => {
+    if (href.startsWith("#")) {
+      scrollTo(href);
+      return;
+    }
+    router.push(href);
+  };
   const [active, setActive] = useState<number | null>(null);
   const focus = active === null ? null : disciplines[active];
 
@@ -144,7 +159,7 @@ export default function ArtistIntro() {
               key={d.word}
               type="button"
               data-cursor="link"
-              onClick={() => scrollTo(d.target)}
+              onClick={() => open(d.href)}
               onMouseEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
               className="group relative border-t border-line pt-5 text-left"

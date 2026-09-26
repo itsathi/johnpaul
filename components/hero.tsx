@@ -9,7 +9,7 @@ import StringVisual from "./hero/string-visual";
 import HalftonePortrait from "./hero/halftone-portrait";
 import MagneticButton from "./ui/magnetic-button";
 import { artist, media, nowPlaying, roles } from "@/content/site";
-import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media";
+import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media-hooks";
 import { usePreloaderDone } from "@/lib/preload";
 
 gsap.registerPlugin(ScrollTrigger);

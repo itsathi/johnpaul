@@ -6,7 +6,7 @@ import SectionTag from "./ui/section-tag";
 import Marquee from "./ui/marquee";
 import Media from "./ui/media";
 import { collaborations } from "@/content/site";
-import { useIsPrecisionPointer } from "@/lib/media";
+import { useIsPrecisionPointer } from "@/lib/media-hooks";
 
 export default function CollabSection() {
   const fine = useIsPrecisionPointer();

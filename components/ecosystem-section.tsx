@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
 import { useScrollTo } from "./smooth-scroll";
@@ -82,7 +83,10 @@ export default function EcosystemSection() {
               dimmed={active !== null && active !== pillar.key}
               onEnter={() => setActive(pillar.key)}
               onLeave={() => setActive(null)}
-              onNavigate={(href) => scrollTo(href)}
+              onNavigate={(href) => {
+                /* Hashes stay on the page; everything else is a route. */
+                if (href.startsWith("#")) scrollTo(href);
+              }}
             />
           ))}
 
@@ -157,19 +161,29 @@ function PillarCard({
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-bone/80">{pillar.line}</p>
 
         <ul className="mt-5 flex flex-col gap-1.5">
-          {pillar.children.map((child) => (
-            <li key={`${pillar.key}-${child.href}-${child.label}`}>
-              <button
-                type="button"
-                onClick={() => onNavigate(child.href)}
-                className="group/link flex items-baseline gap-3 text-left font-mono text-[0.6rem] uppercase tracking-[0.2em] text-mute transition-colors duration-300 hover:text-brass-bright"
-                data-cursor="link"
-              >
+          {pillar.children.map((child) => {
+            const cls =
+              "group/link flex items-baseline gap-3 text-left font-mono text-[0.6rem] uppercase tracking-[0.2em] text-mute transition-colors duration-300 hover:text-brass-bright";
+            const glyph = (
+              <>
                 <span className="h-px w-3 shrink-0 bg-line transition-all duration-300 group-hover/link:w-6 group-hover/link:bg-brass" />
                 {child.label}
-              </button>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={`${pillar.key}-${child.href}-${child.label}`}>
+                {child.href.startsWith("#") ? (
+                  <button type="button" onClick={() => onNavigate(child.href)} className={cls} data-cursor="link">
+                    {glyph}
+                  </button>
+                ) : (
+                  <Link href={child.href} className={cls} data-cursor="link">
+                    {glyph}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </motion.article>
