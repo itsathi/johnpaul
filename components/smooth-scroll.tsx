@@ -23,6 +23,13 @@ type ScrollContextValue = {
   scrollTo: (target: string | number, offset?: number) => void;
 };
 
+/**
+ * Broadcast on every in-page navigation so sections can respond to a target
+ * they own — the Academy listens to switch to the tab its anchor names, which
+ * also makes each tab deep-linkable.
+ */
+export const NAVIGATE_EVENT = "jp:navigate";
+
 const ScrollContext = createContext<ScrollContextValue>({
   scrollTo: () => {},
 });
@@ -58,6 +65,17 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
 
   const scrollTo = useCallback(
     (target: string | number, offset = 0) => {
+      /* Announce first, so a section can restyle itself before the camera
+         arrives rather than a second and a half later. */
+      if (typeof target === "string") {
+        window.dispatchEvent(
+          new CustomEvent<string>(NAVIGATE_EVENT, { detail: target }),
+        );
+        if (target.startsWith("#") && window.location.hash !== target) {
+          window.history.replaceState(null, "", target);
+        }
+      }
+
       const lenis = lenisRef.current;
       if (lenis) {
         lenis.scrollTo(target, { offset, duration: 1.4 });

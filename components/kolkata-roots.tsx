@@ -55,7 +55,7 @@ export default function KolkataRoots() {
   return (
     <section id="roots" className="relative overflow-hidden bg-coal py-28 md:py-44">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="11" label="Roots — Kolkata" />
+        <SectionTag index="12" label="Roots — Kolkata" />
 
         <div className="mt-14 grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
           <div>

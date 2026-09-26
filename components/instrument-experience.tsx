@@ -46,7 +46,7 @@ export default function InstrumentExperience() {
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
         <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <div>
-            <SectionTag index="09" label="The multi-instrumentalist" />
+            <SectionTag index="10" label="The multi-instrumentalist" />
             <p
               className="mt-10 max-w-2xl font-display leading-[1.04] tracking-[-0.02em] text-paper"
               style={{ fontSize: "clamp(2rem, 4.6vw, 4.4rem)" }}

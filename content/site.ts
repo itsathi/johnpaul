@@ -344,10 +344,10 @@ export const support = {
       cta: "Listen everywhere",
     },
     {
-      title: "Vinyl & physical",
-      body: "Want Kalpana on your shelf? Ask about vinyl, CD and merch — early listeners get the first word.",
-      href: "mailto:johnpaulstudio1@gmail.com?subject=Kalpana%20vinyl%20%2F%20merch",
-      cta: "Ask about vinyl",
+      title: "Physical & merch",
+      body: "Vinyl, CD and artist merchandise live in the shop — one place for the catalogue, with enquiries going straight to John.",
+      href: "#shop",
+      cta: "See the shop",
     },
     {
       title: "Follow the rollout",
@@ -359,6 +359,24 @@ export const support = {
   note: "Demonstration build — swap these for live store pages and merch SKUs when they exist.",
 };
 
+/**
+ * The six roles the whole platform is organised around. Used by the hero to
+ * state up front that John's career has more than one shape.
+ */
+export const roles = [
+  "Artist",
+  "Session player",
+  "Live performer",
+  "Touring artist",
+  "Educator",
+  "Collaborator",
+];
+
+/**
+ * Superseded by `navGroups` / `navRail` in content/platform.ts, which group the
+ * same destinations around John's ecosystem. Kept for the flat ordering used by
+ * anything that needs a linear list of sections.
+ */
 export const navigation = [
   { label: "Listen", href: "#listen", id: "listen" },
   { label: "Releases", href: "#releases", id: "releases" },

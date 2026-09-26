@@ -109,6 +109,11 @@ body {
   animation: marquee-x var(--marquee-duration, 48s) linear infinite;
 }
 
+/* Slow orbital drift for the platform constellation rings */
+@keyframes drift {
+  to { transform: rotate(360deg); }
+}
+
 /* Outline display type */
 .text-outline {
   -webkit-text-stroke: 1px color-mix(in srgb, var(--color-paper) 38%, transparent);

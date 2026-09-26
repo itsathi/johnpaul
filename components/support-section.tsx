@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
 import MagneticButton from "./ui/magnetic-button";
 import { support } from "@/content/site";
+import { useScrollTo } from "./smooth-scroll";
 import {
   useIsPrecisionPointer,
   usePrefersReducedMotion,
@@ -21,6 +22,7 @@ export default function SupportSection() {
   const wordRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
   const finePointer = useIsPrecisionPointer();
+  const { scrollTo } = useScrollTo();
 
   useEffect(() => {
     if (reduced || !finePointer) return;
@@ -60,7 +62,7 @@ export default function SupportSection() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="12" label={support.kicker} />
+        <SectionTag index="17" label={support.kicker} />
 
         <div className="mt-12 max-w-3xl">
           <h2
@@ -75,43 +77,50 @@ export default function SupportSection() {
         </div>
 
         <div className="mt-16 grid gap-5 md:grid-cols-3 lg:gap-8">
-          {support.actions.map((action, i) => (
-            <motion.div
-              key={action.title}
-              className="flex flex-col justify-between gap-10 rounded-2xl border border-line bg-coal p-8 md:p-10"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-8% 0px" }}
-              transition={{ duration: 0.9, delay: i * 0.1, ease: EASE }}
-            >
-              <div>
-                <span className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-brass-bright">
-                  {`0${i + 1}`}
-                </span>
-                <h3 className="mt-4 font-display text-3xl tracking-tight text-paper">
-                  {action.title}
-                </h3>
-                <p className="mt-4 text-sm leading-relaxed text-bone">
-                  {action.body}
-                </p>
-              </div>
-
-              <MagneticButton
-                as="a"
-                href={action.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                strength={0.3}
-                className="group inline-flex items-center justify-center gap-3 rounded-full border border-line px-7 py-4 font-mono text-[0.62rem] uppercase tracking-[0.26em] text-paper transition-colors hover:border-brass hover:text-brass-bright"
-                ariaLabel={action.cta}
+          {support.actions.map((action, i) => {
+            const isAnchor = action.href.startsWith("#");
+            return (
+              <motion.div
+                key={action.title}
+                className="flex flex-col justify-between gap-10 rounded-2xl border border-line bg-coal p-8 md:p-10"
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-8% 0px" }}
+                transition={{ duration: 0.9, delay: i * 0.1, ease: EASE }}
               >
-                <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-                {action.cta}
-              </MagneticButton>
-            </motion.div>
-          ))}
+                <div>
+                  <span className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-brass-bright">
+                    {`0${i + 1}`}
+                  </span>
+                  <h3 className="mt-4 font-display text-3xl tracking-tight text-paper">
+                    {action.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-relaxed text-bone">
+                    {action.body}
+                  </p>
+                </div>
+
+                <MagneticButton
+                  as="a"
+                  href={action.href}
+                  {...(isAnchor
+                    ? { onClick: () => scrollTo(action.href) }
+                    : { target: "_blank", rel: "noopener noreferrer" })}
+                  strength={0.3}
+                  className="group inline-flex items-center justify-center gap-3 rounded-full border border-line px-7 py-4 font-mono text-[0.62rem] uppercase tracking-[0.26em] text-paper transition-colors hover:border-brass hover:text-brass-bright"
+                  ariaLabel={action.cta}
+                >
+                  <span
+                    aria-hidden
+                    className="transition-transform duration-300 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                  {action.cta}
+                </MagneticButton>
+              </motion.div>
+            );
+          })}
         </div>
 
         <p className="mt-12 font-mono text-[0.56rem] uppercase leading-relaxed tracking-[0.24em] text-mute">

@@ -71,7 +71,7 @@ export default function KalpanaSection() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="04" label="Kalpana — the album" />
+        <SectionTag index="05" label="Kalpana — the album" />
 
         <div className="mt-24 grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           {/* Artwork */}

@@ -13,7 +13,7 @@ export default function NowPlaying() {
   return (
     <section id="listen" className="relative bg-ink pt-20 md:pt-28">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="01" label={nowPlaying.kicker} />
+        <SectionTag index="03" label={nowPlaying.kicker} />
 
         <div className="mt-14 grid items-end gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
           <motion.div

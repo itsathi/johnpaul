@@ -40,6 +40,11 @@ export function useIsDesktop(breakpoint = 1024): boolean {
 
 let cachedSize = { width: 0, height: 0 };
 
+/* A stable server snapshot. Returning a fresh object from getServerSnapshot
+   makes useSyncExternalStore believe the store changed on every read, which
+   React reports as an infinite-loop risk. */
+const SERVER_SIZE: { width: number; height: number } = { width: 0, height: 0 };
+
 /** Reactive viewport size that stays referentially stable between changes. */
 export function useViewportSize(): { width: number; height: number } {
   const subscribe = (onChange: () => void) => {
@@ -54,7 +59,7 @@ export function useViewportSize(): { width: number; height: number } {
     }
     return cachedSize;
   };
-  return useSyncExternalStore(subscribe, getSnapshot, () => ({ width: 0, height: 0 }));
+  return useSyncExternalStore(subscribe, getSnapshot, () => SERVER_SIZE);
 }
 
 /** Clamp a number between bounds. */

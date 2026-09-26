@@ -44,7 +44,7 @@ export default function StudioSection() {
       className="relative overflow-hidden bg-ink py-28 md:py-44"
     >
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="08" label="Studio & session" />
+        <SectionTag index="09" label="Studio & session" />
         <p
           className="mt-10 max-w-4xl font-display leading-[1.04] tracking-[-0.02em] text-paper"
           style={{ fontSize: "clamp(2.2rem, 5.4vw, 5.4rem)" }}

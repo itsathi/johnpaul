@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { Suspense, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import SectionTag from "./ui/section-tag";
+import RenderBoundary from "./ui/render-boundary";
 import { bindLabInput } from "./webgl/lab-state";
 import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media";
 
@@ -56,7 +57,7 @@ export default function MusicLab() {
       <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end">
         <div className="mx-auto flex w-full max-w-[92rem] items-end justify-between px-6 pb-16 md:px-10 md:pb-20 lg:px-14">
           <div>
-            <SectionTag index="06" label="The laboratory" />
+            <SectionTag index="07" label="The laboratory" />
             <p
               className="mt-6 max-w-2xl font-display leading-[1.05] tracking-[-0.02em] text-paper"
               style={{
@@ -82,15 +83,17 @@ export default function MusicLab() {
         {reduced || !desktop ? (
           <MusicFallback />
         ) : (
-          <Suspense fallback={<MusicFallback />}>
-            <Canvas
-              dpr={[1, 1.5]}
-              gl={{ antialias: true, powerPreference: "high-performance" }}
-              camera={{ position: [0, 2.2, 7.4], fov: 55 }}
-            >
-              <MusicScene />
-            </Canvas>
-          </Suspense>
+          <RenderBoundary fallback={<MusicFallback />}>
+            <Suspense fallback={<MusicFallback />}>
+              <Canvas
+                dpr={[1, 1.5]}
+                gl={{ antialias: true, powerPreference: "high-performance" }}
+                camera={{ position: [0, 2.2, 7.4], fov: 55 }}
+              >
+                <MusicScene />
+              </Canvas>
+            </Suspense>
+          </RenderBoundary>
         )}
       </div>
     </section>

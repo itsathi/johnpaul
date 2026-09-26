@@ -171,7 +171,7 @@ export default function LiveSection() {
             {/* Intro panel */}
             <div className="live-panel flex w-[42vw] shrink-0 flex-col justify-between self-stretch py-[14vh]">
               <div>
-                <SectionTag index="05" label="Live" />
+                <SectionTag index="06" label="Live" />
                 <h2
                   className="mt-10 flex items-baseline gap-6 font-display tracking-[-0.02em] text-paper"
                   style={{ fontSize: "clamp(4rem, 7vw, 10rem)" }}
@@ -248,7 +248,7 @@ export default function LiveSection() {
       {/* Mobile / tablet: stacked vertical gallery */}
       <div className="py-28 md:py-36 lg:hidden">
         <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10">
-          <SectionTag index="05" label="Live" />
+          <SectionTag index="06" label="Live" />
           <h2
             className="mt-10 font-display leading-[0.85] tracking-[-0.02em] text-outline"
             style={{ fontSize: "clamp(5rem, 26vw, 12rem)" }}

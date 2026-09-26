@@ -27,7 +27,7 @@ export default function CollabSection() {
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <SectionTag index="07" label="Collaborations" />
+            <SectionTag index="08" label="Collaborations" />
             <p
               className="mt-10 max-w-2xl font-display leading-[1.04] tracking-[-0.02em] text-paper"
               style={{ fontSize: "clamp(2rem, 4.4vw, 4.2rem)" }}

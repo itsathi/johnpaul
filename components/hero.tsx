@@ -6,8 +6,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Media from "./ui/media";
 import StringVisual from "./hero/string-visual";
+import HalftonePortrait from "./hero/halftone-portrait";
 import MagneticButton from "./ui/magnetic-button";
-import { artist, media, nowPlaying } from "@/content/site";
+import { artist, media, nowPlaying, roles } from "@/content/site";
 import { useIsDesktop, usePrefersReducedMotion } from "@/lib/media";
 import { usePreloaderDone } from "@/lib/preload";
 
@@ -86,9 +87,15 @@ export default function Hero() {
         />
       </div>
 
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,8,0.78)_0%,rgba(10,9,8,0.12)_34%,rgba(10,9,8,0.18)_58%,rgba(10,9,8,0.98)_100%)] md:bg-gradient-to-t md:from-ink md:via-ink/30 md:to-ink/70" />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/20 to-transparent md:from-ink/85 md:via-transparent md:to-ink/30" />
-      <div className="vignette absolute inset-0 opacity-70 md:opacity-100" />
+      {/* the opening shot: the portrait, printed as a halftone plate */}
+      <HalftonePortrait />
+
+      {/* Scrims sit over the plate now, so they are scoped to what they are
+          actually for: keeping the type legible, and letting the frame fall
+          away at its edges. Anything heavier and the plate goes to mud. */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,8,0.62)_0%,rgba(10,9,8,0.06)_26%,rgba(10,9,8,0.5)_70%,rgba(10,9,8,0.96)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(10,9,8,0.88)_0%,rgba(10,9,8,0.46)_32%,rgba(10,9,8,0.06)_60%,transparent_100%)] md:bg-[linear-gradient(to_right,rgba(10,9,8,0.86)_0%,rgba(10,9,8,0.4)_28%,transparent_56%)]" />
+      <div className="vignette absolute inset-0 opacity-50 md:opacity-70" />
 
       <div
         className="absolute inset-y-0 right-0 hidden w-3/5 opacity-80 md:block"
@@ -169,14 +176,26 @@ export default function Hero() {
             variants={reveal(0.5)}
             initial="wait"
             animate={stage}
-            className="mt-6 flex max-w-xl flex-col gap-2 md:mt-10 md:flex-row md:items-center md:gap-8"
+            className="mt-6 flex max-w-xl flex-col gap-4 md:mt-10 md:gap-6"
           >
             <p className="text-[0.82rem] leading-relaxed text-bone md:text-base">
               {artist.subDescriptor}
             </p>
-            <p className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-mute">
-              Session · Live · Records
-            </p>
+
+            {/* the six roles, stated up front rather than left to be discovered */}
+            <ul className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[0.58rem] uppercase tracking-[0.22em] text-brass-bright md:gap-x-4 md:text-[0.66rem] md:tracking-[0.28em]">
+              {roles.map((role, i) => (
+                <li key={role} className="flex items-center gap-3 md:gap-4">
+                  {i > 0 ? (
+                    <span
+                      className="h-px w-4 shrink-0 bg-brass/45"
+                      aria-hidden
+                    />
+                  ) : null}
+                  <span>{role}</span>
+                </li>
+              ))}
+            </ul>
           </motion.div>
 
           <motion.div

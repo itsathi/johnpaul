@@ -12,7 +12,7 @@ export default function Discography() {
   return (
     <section id="releases" className="relative bg-coal pt-24 pb-28 md:pt-36 md:pb-40">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="02" label={discography.kicker} />
+        <SectionTag index="04" label={discography.kicker} />
 
         <div className="mt-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <h2
