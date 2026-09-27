@@ -1,4 +1,5 @@
 import { shop } from "@/content/platform";
+import { pexels } from "@/lib/media";
 
 /**
  * Commerce layer.
@@ -100,6 +101,16 @@ const pending = (rows: [string, string | null][]): ProductDetail["specs"] =>
 const enquiryFlow: ProductDetail["fulfilment"] =
   "This item is a catalogue slot, not a live product. Enquiries are collected and confirmed by the studio — nothing is charged here, and no order is placed.";
 
+/**
+ * Product photography for the demonstration catalogue. Each id is a pinned
+ * Pexels photo — keyword endpoints no longer exist — and `pexels()` hands
+ * back a width-limited, cropped variant of it.
+ */
+const stock = (id: string, altText: string): ProductImage => ({
+  url: pexels(id, 1200, 1),
+  altText,
+});
+
 const demoProducts: Product[] = [
   {
     id: "gid://shopify/Product/apparel-tee-tour",
@@ -111,7 +122,8 @@ const demoProducts: Product[] = [
     badge: "Placeholder",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("9558763",
+      "Blank heavyweight cotton tee, photographed in a studio"),
     seed: 11,
     variants: [unpriced("apparel-tee-tour")],
     detail: {
@@ -142,7 +154,8 @@ const demoProducts: Product[] = [
     badge: "Placeholder",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("9775766",
+      "Studio apparel — a cap and a top, shot close in soft light"),
     seed: 23,
     variants: [unpriced("apparel-tee-studio")],
     detail: {
@@ -172,7 +185,8 @@ const demoProducts: Product[] = [
     badge: "Placeholder",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("9558689",
+      "Unstructured fitted cap, photographed in a studio"),
     seed: 37,
     variants: [unpriced("apparel-cap")],
     detail: {
@@ -202,7 +216,8 @@ const demoProducts: Product[] = [
     badge: "Awaiting details",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("2308825",
+      "Vinyl record on a turntable"),
     seed: 5,
     variants: [unpriced("music-vinyl-kalpana")],
     detail: {
@@ -234,7 +249,8 @@ const demoProducts: Product[] = [
     badge: "Awaiting details",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("5003397",
+      "CDs in jewel cases, album artwork visible"),
     seed: 19,
     variants: [unpriced("physical-cd-kalpana")],
     detail: {
@@ -264,7 +280,8 @@ const demoProducts: Product[] = [
     badge: "Awaiting details",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("383568",
+      "Framed art prints hung on a plain wall"),
     seed: 29,
     variants: [unpriced("limited-print-kalpana")],
     detail: {
@@ -297,7 +314,8 @@ const demoProducts: Product[] = [
     badge: "Placeholder",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("341014",
+      "Vintage music poster on a brick wall"),
     seed: 41,
     variants: [unpriced("limited-poster-kalpana")],
     detail: {
@@ -327,7 +345,8 @@ const demoProducts: Product[] = [
     badge: "Placeholder",
     price: null,
     status: "DRAFT",
-    featuredImage: null,
+    featuredImage: stock("5190600",
+      "An open notebook with handwriting, photographed from above"),
     seed: 53,
     variants: [unpriced("limited-notebook")],
     detail: {

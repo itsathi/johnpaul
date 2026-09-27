@@ -87,12 +87,15 @@ export default function Hero() {
         />
       </div>
 
-      {/* the opening shot: the portrait, printed as a halftone plate */}
+      {/* the opening shot: the portrait, printed as a halftone plate. It
+          arrives whole, then comes apart to uncover this photograph. */}
       <HalftonePortrait />
 
       {/* Scrims sit over the plate now, so they are scoped to what they are
           actually for: keeping the type legible, and letting the frame fall
-          away at its edges. Anything heavier and the plate goes to mud. */}
+          away at its edges. Anything heavier and the plate goes to mud — and
+          once the plate clears they are the only thing holding the photo down
+          to the same value, so they are not tuned any stronger than that. */}
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,9,8,0.62)_0%,rgba(10,9,8,0.06)_26%,rgba(10,9,8,0.5)_70%,rgba(10,9,8,0.96)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(10,9,8,0.88)_0%,rgba(10,9,8,0.46)_32%,rgba(10,9,8,0.06)_60%,transparent_100%)] md:bg-[linear-gradient(to_right,rgba(10,9,8,0.86)_0%,rgba(10,9,8,0.4)_28%,transparent_56%)]" />
       <div className="vignette absolute inset-0 opacity-50 md:opacity-70" />

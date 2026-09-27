@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
+import ContactForm from "./contact-form";
 import MagneticButton from "./ui/magnetic-button";
 import { useScrollTo } from "./smooth-scroll";
 import { contact, artist } from "@/content/site";
@@ -51,13 +51,6 @@ export default function ContactSection() {
   const go = (href: string) => {
     if (href.startsWith("#")) scrollTo(href);
     else router.push(href);
-  };
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const onSubscribe = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubscribed(true);
   };
 
   return (
@@ -191,7 +184,7 @@ export default function ContactSection() {
             </div>
           </motion.div>
 
-          {/* ---- stay in the loop ---- */}
+          {/* ---- write to the studio ---- */}
           <motion.div
             className="flex flex-col justify-between gap-10"
             initial={{ opacity: 0, y: 24 }}
@@ -204,98 +197,33 @@ export default function ContactSection() {
                 className="font-display leading-none tracking-tight text-paper"
                 style={{ fontSize: "clamp(1.6rem, 3vw, 2.6rem)" }}
               >
-                Follow the rollout
+                Write to the studio
               </h3>
               <p className="mt-5 max-w-md text-sm leading-relaxed text-bone">
-                Whether it&apos;s a tour, a record, a single session or a
-                conversation about where your music should go next — write,
-                call, or follow along as the next chapters of{" "}
-                <em className="font-display italic text-brass-bright">Kalpana</em>{" "}
-                land.
+                Booking, sessions, production or a conversation about where your
+                music should go next. The more you can say about the work, the
+                more useful the first reply will be.
               </p>
             </div>
 
-            <SubscribeForm
-              email={email}
-              setEmail={setEmail}
-              subscribed={subscribed}
-              onSubmit={onSubscribe}
-            />
+            <ContactForm />
 
             <p className="font-mono text-[0.58rem] uppercase leading-relaxed tracking-[0.26em] text-mute">
-              Follow @johnpaul.india — new music, live dates and the studio,
-              documented in the open.
+              Looking for the detailed version?{" "}
+              <a
+                href="/contact"
+                data-cursor="link"
+                className="text-brass-bright underline-offset-4 hover:underline"
+              >
+                The contact board
+              </a>{" "}
+              asks what your message is about and shows only the fields that
+              apply.
             </p>
           </motion.div>
         </div>
       </div>
     </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Demonstration only — no request leaves the browser and nothing is   */
-/* stored. The state exists so the client can see the intended UX.      */
-/* ------------------------------------------------------------------ */
-
-function SubscribeForm({
-  email,
-  setEmail,
-  subscribed,
-  onSubmit,
-}: {
-  email: string;
-  setEmail: (v: string) => void;
-  subscribed: boolean;
-  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
-}) {
-  return (
-    <form onSubmit={onSubmit} className="w-full max-w-md">
-      <label
-        htmlFor="subscribe-email"
-        className="font-mono text-[0.58rem] uppercase tracking-[0.28em] text-mute"
-      >
-        Subscribe
-      </label>
-
-      {subscribed ? (
-        <motion.p
-          className="mt-4 flex items-center gap-3 border-b border-brass/50 pb-4 font-display text-lg italic text-brass-bright"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: EASE }}
-        >
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-brass" />
-          You&apos;re on the list — demonstration only, nothing was sent.
-        </motion.p>
-      ) : (
-        <div className="mt-4 flex items-center gap-3 border-b border-line pb-4 transition-colors duration-300 focus-within:border-brass">
-          <input
-            id="subscribe-email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="min-w-0 flex-1 bg-transparent font-mono text-[0.7rem] tracking-[0.16em] text-paper placeholder:text-mute/60 focus:outline-none"
-          />
-          <button
-            type="submit"
-            data-cursor="link"
-            aria-label="Subscribe"
-            className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line text-paper transition-colors hover:border-brass hover:text-brass-bright"
-          >
-            <Arrow />
-          </button>
-        </div>
-      )}
-
-      <p className="mt-4 font-mono text-[0.52rem] uppercase leading-relaxed tracking-[0.24em] text-mute/80">
-        Demonstration form — no mailing list is connected and nothing is
-        stored.
-      </p>
-    </form>
   );
 }
 

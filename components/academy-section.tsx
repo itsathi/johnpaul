@@ -6,6 +6,7 @@ import SectionTag from "./ui/section-tag";
 import SectionLink from "./ui/section-link";
 import MediaReveal from "./ui/media-reveal";
 import MagneticButton from "./ui/magnetic-button";
+import PrivateLessonCard from "./private-lesson-card";
 import { useScrollTo, NAVIGATE_EVENT } from "./smooth-scroll";
 import { academy, type AcademyItem, type AcademyTrack } from "@/content/platform";
 import { media } from "@/content/site";
@@ -250,13 +251,23 @@ export default function AcademySection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
         >
-          {track.items.map((item, i) => (
-            <AcademyCard
-              key={`${track.key}-${item.no}`}
-              item={item}
-              index={i}
-            />
-          ))}
+          {track.items.map((item, i) =>
+            track.key === "lessons" && i === 0 ? (
+              /* the flagship lesson gets the direction-aware hover plate; the
+                 rest of the catalogue keeps the flat card */
+              <PrivateLessonCard
+                key={`${track.key}-${item.no}`}
+                item={item}
+                index={i}
+              />
+            ) : (
+              <AcademyCard
+                key={`${track.key}-${item.no}`}
+                item={item}
+                index={i}
+              />
+            ),
+          )}
         </motion.div>
 
         {/* ---- CTAs ---- */}

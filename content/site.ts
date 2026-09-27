@@ -270,6 +270,13 @@ export const contact = {
   ],
 };
 
+/**
+ * The Instagram handle, stated rather than parsed out of `contact.socials[0]`.
+ * The newsletter quotes it as text, and a handle is not something to recover by
+ * splitting a URL at runtime.
+ */
+export const instagramHandle = "@johnpaul.india";
+
 /* Now playing — the single a listener should hear first. Only verified links. */
 export const nowPlaying = {
   kicker: "Now Playing",

@@ -22,3 +22,30 @@ export function youtubeEmbed(href: string): string {
   if (embed) return `https://www.youtube.com/embed/${embed[1]}`;
   return href;
 }
+
+/**
+ * Width-limited, colour-managed URL for a Pexels stock photo id, e.g.
+ * `9558763` -> "https://images.pexels.com/photos/9558763/pexels-photo-9558763.jpeg".
+ *
+ * Only pinned photo ids work. Unsplash Source (`source.unsplash.com/random?…`)
+ * was deprecated in 2021 and fully sunset in June 2024 — it now returns 503 —
+ * so there is no keyword-to-image endpoint left to call; every id here was
+ * chosen by hand and verified to serve a real image.
+ */
+export function pexels(
+  id: string,
+  width: number,
+  ratio?: number
+): string {
+  const base = `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg`;
+  const params = new URLSearchParams({
+    auto: "compress",
+    cs: "tinysrgb",
+    w: String(width),
+  });
+  if (ratio) {
+    params.set("h", String(Math.round(width * ratio)));
+    params.set("fit", "crop");
+  }
+  return `${base}?${params.toString()}`;
+}

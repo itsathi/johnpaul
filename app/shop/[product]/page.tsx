@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import PageHero from "@/components/ui/page-hero";
 import AddToCart from "@/components/add-to-cart";
@@ -54,7 +55,19 @@ export default async function ProductPage({
         <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
           <div className="grid gap-10 lg:grid-cols-2">
             <div className="relative aspect-[4/5] w-full overflow-hidden border border-line bg-coal">
-              <PlaceholderArt seed={product.seed} label={product.title} />
+              {product.featuredImage ? (
+                <Image
+                  src={product.featuredImage.url}
+                  alt={product.featuredImage.altText}
+                  width={1200}
+                  height={1500}
+                  sizes="(min-width: 1024px) 46vw, 92vw"
+                  className="h-full w-full object-cover"
+                  priority
+                />
+              ) : (
+                <PlaceholderArt seed={product.seed} label={product.title} />
+              )}
             </div>
 
             <div>
@@ -128,7 +141,18 @@ export default async function ProductPage({
                     className="group flex h-full flex-col border border-line p-6 transition-colors hover:border-brass/40"
                   >
                     <div className="aspect-[4/3] w-full overflow-hidden border border-line bg-smoke">
-                      <PlaceholderArt seed={p.seed} label={p.title} />
+                      {p.featuredImage ? (
+                        <Image
+                          src={p.featuredImage.url}
+                          alt={p.featuredImage.altText}
+                          width={1200}
+                          height={900}
+                          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 92vw"
+                          className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
+                        />
+                      ) : (
+                        <PlaceholderArt seed={p.seed} label={p.title} />
+                      )}
                     </div>
                     <p className="mt-5 font-display text-2xl leading-none tracking-tight text-bone transition-colors group-hover:text-brass-bright">
                       {p.title}

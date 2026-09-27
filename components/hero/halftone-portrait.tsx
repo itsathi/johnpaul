@@ -26,13 +26,13 @@ const DURATION = 2600;
 const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5);
 
 /**
- * The opening shot: John's portrait printed as a halftone plate out of a few
- * thousand dots that fly in from the edges and lock to the grid, then flood
- * from dots into continuous tone. Scroll hands the plate back to noise so the
- * hero dissolves into the page.
+ * The opening shot: John's portrait, printed as a halftone plate out of a few
+ * thousand dots. The plate is already whole when it arrives, then the dots come
+ * apart and drift off the frame, uncovering the stage photograph underneath.
+ * Scroll hands the plate back to noise so the hero dissolves into the page.
  *
- * The photograph beneath stays in the DOM (and in the accessibility tree); this
- * only ever draws over it, and the whole thing is an enhancement — no WebGL, a
+ * The photograph stays in the DOM (and in the accessibility tree); this only
+ * ever draws over it, and the whole thing is an enhancement — no WebGL, a
  * coarse grid, or a failed context all fall back to the plain image.
  */
 export default function HalftonePortrait() {
@@ -41,7 +41,9 @@ export default function HalftonePortrait() {
   const loaded = usePreloaderDone();
   const [visible, setVisible] = useState(false);
 
-  const progress = useRef(0);
+  /* Starts whole, so the first painted frame is a finished plate rather than a
+     flash of empty ground before the entrance has advanced. */
+  const progress = useRef(1);
   const pointer = useRef({ x: -999, y: -999, amt: 0 });
   const started = useRef<number | null>(null);
 
@@ -64,12 +66,18 @@ export default function HalftonePortrait() {
         const elapsed = performance.now() - t0;
         const entrance = easeOutQuint(Math.min(elapsed / DURATION, 1));
 
+        /* The plate is the intro and the photograph is the arrival, so the
+           entrance only ever takes coverage away. */
+        let plate = 1 - entrance;
+
         /* Hand the plate back as the hero leaves, so the next section reads as
            a continuation rather than a hard cut. */
         const h = window.innerHeight || 1;
         const out = Math.min(Math.max(window.scrollY / (h * 0.75), 0), 1);
         const outEase = out * out * (3 - 2 * out);
-        progress.current = entrance * (1 - 0.88 * outEase);
+        plate *= 1 - 0.88 * outEase;
+
+        progress.current = plate;
       }
       raf = requestAnimationFrame(tick);
     };

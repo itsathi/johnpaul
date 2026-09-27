@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
 import MagneticButton from "./ui/magnetic-button";
@@ -118,14 +119,15 @@ export default function ShopSection({
               viewport={{ once: true, margin: "-6% 0px" }}
               transition={{ duration: 0.7, delay: (i % 4) * 0.06, ease: EASE }}
             >
-              <div className="relative">
+              <div className="relative overflow-hidden">
                 {product.featuredImage ? (
-                  // A real product image would render here once a store exists.
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={product.featuredImage.url}
                     alt={product.featuredImage.altText}
-                    className="aspect-square w-full object-cover"
+                    width={1200}
+                    height={1200}
+                    sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 92vw"
+                    className="aspect-square w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]"
                   />
                 ) : (
                   <div className="transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]">
@@ -133,7 +135,10 @@ export default function ShopSection({
                   </div>
                 )}
 
-                <span className="absolute top-4 left-4 rounded-full border border-line bg-ink/70 px-3 py-1 font-mono text-[0.48rem] uppercase tracking-[0.24em] text-mute backdrop-blur-sm">
+                {/* keeps the badge legible over a photograph without flattening the plate */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/20 opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+
+                <span className="absolute top-4 left-4 rounded-full border border-line bg-ink/70 px-3 py-1 font-mono text-[0.48rem] uppercase tracking-[0.24em] text-mute backdrop-blur-sm transition-colors duration-500 group-hover:border-brass/45 group-hover:text-brass-bright">
                   {product.badge ?? "Demo"}
                 </span>
               </div>

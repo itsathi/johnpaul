@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import PageHero from "@/components/ui/page-hero";
 import EnrolButton from "@/components/enrol-button";
-import { RevealGroup, RevealItem } from "@/components/ui/reveal";
-import { GhostLink, SourceNote } from "@/components/ui/atoms";
+import ExpandableClassCards from "@/components/expandable-class-cards";
+import { GhostLink } from "@/components/ui/atoms";
 import { wix } from "@/lib/media";
 import { classes } from "@/content/academy-program";
 
@@ -92,35 +92,9 @@ export default function ClassesPage() {
             <span className="h-px w-8 bg-line" />
             <span>Reserved slots, detail pending</span>
           </p>
-          <RevealGroup className="mt-10 grid gap-4 md:grid-cols-2">
-            {classes
-              .filter((c) => c.source === "demo")
-              .map((c) => (
-                <RevealItem key={c.slug}>
-                  <article className="flex h-full flex-col border border-line p-7 transition-colors hover:border-brass/40">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <span className="font-mono text-[0.58rem] tracking-[0.28em] text-brass">
-                        {c.no}
-                      </span>
-                      <SourceNote source="demo" label="Placeholder" />
-                    </div>
-                    <h3 className="mt-4 font-display text-2xl leading-none tracking-tight text-paper md:text-3xl">
-                      {c.title}
-                    </h3>
-                    <p className="mt-4 flex-1 text-sm leading-relaxed text-bone/80">{c.blurb}</p>
-                    <div className="mt-7 flex flex-wrap items-center gap-5">
-                      <GhostLink href={`/academy/classes/${c.slug}`}>Details</GhostLink>
-                      <EnrolButton
-                        slug={c.slug}
-                        title={c.title}
-                        track="Classes"
-                        label="Register interest"
-                      />
-                    </div>
-                  </article>
-                </RevealItem>
-              ))}
-          </RevealGroup>
+          <div className="mt-10">
+            <ExpandableClassCards classes={classes.filter((c) => c.source === "demo")} />
+          </div>
         </div>
       </section>
     </>

@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
+import { LampContainer } from "./ui/lamp";
+import { StickyScroll, type StickyScrollCard } from "./ui/sticky-scroll-reveal";
 import { useScrollTo } from "./smooth-scroll";
 import { useMediaQuery } from "@/lib/media-hooks";
 import { ecosystem, type Pillar } from "@/content/platform";
@@ -11,6 +13,13 @@ import { ecosystem, type Pillar } from "@/content/platform";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PILLARS = ecosystem.pillars;
 const COUNT = PILLARS.length;
+
+/** The six rooms as a scrolled sequence, one card per pillar. */
+const STICKY_CARDS: StickyScrollCard[] = PILLARS.map((pillar) => ({
+  title: pillar.title,
+  description: pillar.line,
+  content: <PillarDoors pillar={pillar} />,
+}));
 
 /* Deck geometry. The fan is the whole effect: every card behind the front one
    is lifted by `PEEK` and scaled down a little, so only its header row shows and
@@ -86,41 +95,58 @@ export default function EcosystemSection() {
   const step = (delta: number) => setFront((f) => (f + delta + COUNT) % COUNT);
 
   return (
-    <section id="ecosystem" className="relative overflow-hidden bg-ink py-24 md:py-36">
-      <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="01" label={ecosystem.kicker} />
+    <section id="ecosystem" className="relative overflow-hidden bg-ink">
+      {/* ---- the lamp header: the sign over the platform ---- */}
+      <LampContainer className="min-h-[32rem] md:min-h-[38rem]">
+        <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
+          <SectionTag index="01" label={ecosystem.kicker} />
 
-        <div className="mt-12 grid gap-8 md:mt-16 lg:grid-cols-[1.35fr_1fr] lg:items-end lg:gap-20">
-          <h2
-            className="font-display leading-[0.96] tracking-[-0.02em] text-paper"
-            style={{ fontSize: "clamp(2.4rem, 6.6vw, 6rem)" }}
-          >
-            {ecosystem.headline.map((line, i) => (
-              <span key={line} className="block overflow-hidden">
-                <motion.span
-                  className={`block will-change-transform ${
-                    i === 2 ? "italic text-bone/70" : ""
-                  }`}
-                  initial={{ y: "112%" }}
-                  whileInView={{ y: "0%" }}
-                  viewport={{ once: true, margin: "-12% 0px" }}
-                  transition={{ duration: 1.1, delay: i * 0.1, ease: EASE }}
-                >
-                  {line}
-                </motion.span>
-              </span>
-            ))}
-          </h2>
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1.35fr_1fr] lg:items-end lg:gap-20">
+            <h2
+              className="font-display leading-[0.96] tracking-[-0.02em] text-paper"
+              style={{ fontSize: "clamp(2.4rem, 6.6vw, 6rem)" }}
+            >
+              {ecosystem.headline.map((line, i) => (
+                <span key={line} className="block overflow-hidden">
+                  <motion.span
+                    className={`block will-change-transform ${
+                      i === 2 ? "italic text-bone/70" : ""
+                    }`}
+                    initial={{ y: "112%" }}
+                    whileInView={{ y: "0%" }}
+                    viewport={{ once: true, margin: "-12% 0px" }}
+                    transition={{ duration: 1.1, delay: i * 0.1, ease: EASE }}
+                  >
+                    {line}
+                  </motion.span>
+                </span>
+              ))}
+            </h2>
 
-          <motion.p
-            className="max-w-md text-sm leading-relaxed text-bone md:text-base"
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-10% 0px" }}
-            transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
-          >
-            {ecosystem.intro}
-          </motion.p>
+            <motion.p
+              className="max-w-md text-sm leading-relaxed text-bone md:text-base"
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-10% 0px" }}
+              transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
+            >
+              {ecosystem.intro}
+            </motion.p>
+          </div>
+        </div>
+      </LampContainer>
+
+      <div className="relative mx-auto w-full max-w-[92rem] px-6 py-20 md:px-10 md:py-28 lg:px-14">
+        {/* ---- the six rooms, walked one at a time ----
+            The panel holds the doors for whichever room is active, so this
+            answers "what is actually in there" before the deck asks you to
+            pick one. */}
+        <div className="relative mx-auto max-w-4xl">
+          <StickyScroll
+            content={STICKY_CARDS}
+            className="h-[30rem] rounded-none p-0 md:h-[34rem] md:p-6"
+            contentClassName="h-64 w-full rounded-none border border-line p-6 md:h-72"
+          />
         </div>
 
         {/* the mark the deck is dealt from */}
@@ -315,6 +341,37 @@ export default function EcosystemSection() {
 }
 
 /* ------------------------------------------------------------------ */
+
+/** The sticky panel's payload: one room's number, name and doors. */
+function PillarDoors({ pillar }: { pillar: Pillar }) {
+  return (
+    <div className="flex h-full flex-col">
+      <span className="font-mono text-[0.55rem] tracking-[0.3em] text-brass-bright">
+        {pillar.no}
+      </span>
+      <h4 className="mt-3 font-display text-2xl leading-none tracking-tight text-paper">
+        {pillar.title}
+      </h4>
+      <ul className="mt-5 flex flex-col gap-2.5">
+        {pillar.children.map((child) => (
+          <li key={`${pillar.key}-${child.href}-${child.label}`}>
+            <Link
+              href={child.href}
+              data-cursor="link"
+              className="group/door flex items-baseline gap-3 font-mono text-[0.56rem] uppercase tracking-[0.2em] text-bone/85 transition-colors duration-300 hover:text-brass-bright"
+            >
+              <span className="h-px w-3 shrink-0 bg-line transition-all duration-300 group-hover/door:w-6 group-hover/door:bg-brass" />
+              {child.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <span className="mt-auto pt-5 font-mono text-[0.48rem] uppercase tracking-[0.24em] text-mute">
+        {pillar.children.length} doors
+      </span>
+    </div>
+  );
+}
 
 function FrontCard({
   pillar,

@@ -19,7 +19,7 @@ const fragmentShader = /* glsl */ `
   uniform sampler2D uTex;
   uniform vec2  uRes;        // drawing-buffer size, px
   uniform float uTime;
-  uniform float uProgress;   // 0 = scattered, 1 = fully resolved
+  uniform float uProgress;   // 1 = plate resolved, 0 = dissolved into the photo
   uniform float uImgAspect;
   uniform vec2  uFocus;      // assembly origin, uv
   uniform vec2  uPointer;    // px
@@ -59,7 +59,7 @@ const fragmentShader = /* glsl */ `
     float t = clamp((uProgress - delay) / 0.48, 0.0, 1.0);
     t = t * t * (3.0 - 2.0 * t);
 
-    /* ---- where this dot flies in from ---- */
+    /* ---- where this dot flies to, on its way off the plate ---- */
     float h1 = hash21(cid);
     float h2 = hash21(cid + 19.73);
     vec2 dir = normalize(vec2(h1 - 0.5, h2 - 0.5) + vec2(1e-4));
@@ -89,9 +89,12 @@ const fragmentShader = /* glsl */ `
     float lum = dot(tex, vec3(0.2126, 0.7152, 0.0722));
     lum = clamp((lum - 0.02) * 1.35, 0.0, 1.0);
 
-    /* ---- dot size, then the final beat: dots flood into tone ---- */
+    /* ---- dot size, then the flood into tone once a dot has arrived ----
+       The bloom is scaled by t so a flooded dot still shrinks back to nothing
+       as the plate dissolves; ungated, uBloom pins every dot at a fixed radius
+       and the plate would sit on the photo forever. */
     float r = cell * 0.62 * lum * t;
-    r = mix(r, cell * 0.98, uBloom);
+    r = mix(r, cell * 0.98, uBloom * t);
 
     /* Coverage as a clamped linear falloff. A plain smoothstep(r, r - aa, d)
        inverts once the radius drops below the feather and floods the whole
@@ -109,21 +112,30 @@ const fragmentShader = /* glsl */ `
     vec3 col = duotone(lum);
     col += vec3(0.95, 0.72, 0.42) * infl * 0.22;
 
-    /* ---- a prism band crossing while the plate resolves ---- */
+    /* ---- a prism band crossing while the plate comes apart ---- */
     float sweep = uRes.x * (1.3 - 0.62 * uProgress);
     float band = exp(-pow((px.x - sweep) / (uRes.x * 0.055), 2.0));
     col += vec3(0.95, 0.74, 0.46) * band * (1.0 - smoothstep(0.9, 1.0, uProgress)) * 0.14;
 
     vec3 outColor = mix(bg, col, m);
 
-    /* dither, so the wide gradients stay smooth */
+    /* ---- opacity: the ground is only there to give the positive print
+       somewhere to sit, so it peels away with the plate and lets the stage
+       photograph underneath come through. It holds for the first beat so the
+       plate reads as a whole image before it starts opening up. */
+    float open = 1.0 - uProgress;
+    float groundA = 1.0 - smoothstep(0.12, 0.95, open);
+    float alpha = max(m, groundA);
+
+    /* dither, so the wide gradients stay smooth — scaled by alpha, or it
+       speckles across the photograph once the plate is gone */
     float dither = (hash21(px + fract(uTime * 0.37)) - 0.5) * 0.014;
-    gl_FragColor = vec4(outColor + dither, 1.0);
+    gl_FragColor = vec4(outColor + dither * alpha, alpha);
   }
 `;
 
 export type HalftoneInput = {
-  /** 0 -> 1 across the entrance, then eased back as the hero scrolls away. */
+  /** 1 while the plate is whole, easing to 0 as it dissolves and on scroll-out. */
   progress: { current: number };
   /** 0 -> 1 while the pointer is over the hero. */
   pointer: { current: { x: number; y: number; amt: number } };
@@ -131,7 +143,7 @@ export type HalftoneInput = {
 
 type Props = {
   src: string;
-  /** 0 dots stay dots, 1 they flood into continuous tone. */
+  /** 0 dots stay dots, 1 they flood into continuous tone once they land. */
   bloom: number;
   focus: [number, number];
   zoom: number;
@@ -197,7 +209,7 @@ export default function HalftoneScene({ src, bloom, focus, zoom, density, input 
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
-        transparent={false}
+        transparent
         depthTest={false}
         depthWrite={false}
       />

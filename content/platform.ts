@@ -312,7 +312,7 @@ export const academy = {
             { label: "Where", value: "In studio or online" },
             { label: "Duration", value: null },
             { label: "Level", value: "Any" },
-            { label: "Fee", value: null },
+            { label: "Fee", value: "To be confirmed, or contact John" },
           ],
           cta: "Book a Private Lesson",
           source: "demo",
