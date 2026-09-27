@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import PageHero from "@/components/ui/page-hero";
 import NowPlaying from "@/components/now-playing";
+import MusicVault from "@/components/music-vault";
 import Discography from "@/components/discography";
 import KalpanaSection from "@/components/kalpana-section";
 import LiveSection from "@/components/live-section";
@@ -37,6 +39,15 @@ export default function MusicPage() {
       />
 
       <NowPlaying />
+
+      {/* The vault reads `?room=` for its deep link, which is a `useSearchParams`
+          read — hence the boundary. `NowPlaying` above already carries the
+          "press play" invitation, so the vault arrives as the second half of
+          that gesture rather than as a second, competing entry point. */}
+      <Suspense fallback={<VaultSkeleton />}>
+        <MusicVault />
+      </Suspense>
+
       <Discography />
       <KalpanaSection />
       <LiveSection />
@@ -70,5 +81,26 @@ export default function MusicPage() {
         </div>
       </section>
     </>
+  );
+}
+
+/** Matches the vault's opening geometry so the swap is not a layout jump. */
+function VaultSkeleton() {
+  return (
+    <section aria-hidden className="bg-ink py-20 md:py-28">
+      <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
+        <div className="h-2 w-28 bg-line" />
+        <div className="mt-6 h-14 w-full max-w-xl bg-line/60" />
+        <div className="mt-14 h-12 w-full max-w-2xl border-b border-line" />
+        <div className="mt-14 grid gap-8 lg:grid-cols-[0.85fr_1fr]">
+          <div className="aspect-square w-full bg-line/40" />
+          <div className="space-y-4 py-4">
+            <div className="h-2 w-32 bg-line" />
+            <div className="h-12 w-3/4 bg-line/60" />
+            <div className="h-20 w-full bg-line/30" />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

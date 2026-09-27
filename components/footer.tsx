@@ -1,4 +1,5 @@
 import { artist } from "@/content/site";
+import BackToTop from "./back-to-top";
 
 export default function Footer() {
   return (
@@ -21,14 +22,7 @@ export default function Footer() {
 
         <div className="flex items-center gap-8 font-mono text-[0.58rem] uppercase tracking-[0.26em] text-mute">
           <span>Kolkata → the world</span>
-          <a
-            href="#top"
-            data-cursor="link"
-            className="flex items-center gap-2 transition-colors hover:text-brass-bright"
-          >
-            Back to top
-            <span aria-hidden>↑</span>
-          </a>
+          <BackToTop />
         </div>
       </div>
     </footer>

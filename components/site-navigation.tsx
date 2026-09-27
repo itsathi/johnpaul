@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
@@ -8,6 +8,7 @@ import { artist, contact } from "@/content/site";
 import { navGroups } from "@/content/platform";
 import { useCart } from "@/lib/providers/commerce-provider";
 import { useScrollTo } from "./smooth-scroll";
+import { useDialog } from "@/lib/use-dialog";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const WIPE = [0.83, 0, 0.17, 1] as const;
@@ -27,6 +28,8 @@ export default function SiteNavigation() {
   const { count, open: openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const closeMenu = useCallback(() => setOpen(false), []);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
 
@@ -59,9 +62,11 @@ export default function SiteNavigation() {
     return path === pathname;
   };
 
-  /* Escape closes an open group and returns focus to its trigger. */
+  /* Escape closes an open group and returns focus to its trigger. Skipped
+     while the mobile menu is up: Escape there belongs to the menu, which is
+     the outermost thing open, and closing both at once is disorienting. */
   useEffect(() => {
-    if (!openGroup) return;
+    if (!openGroup || open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       const trigger = headerRef.current?.querySelector<HTMLButtonElement>(
@@ -72,7 +77,13 @@ export default function SiteNavigation() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [openGroup]);
+  }, [open, openGroup]);
+
+  /* The mobile menu is a dialog, so it gets the full contract — Escape, the
+     focus trap, focus restore and the scroll lock. It had none of them: the
+     Escape handler above was gated on the *desktop* disclosure state, so on a
+     phone there was no way out but hitting the X. */
+  useDialog(open, closeMenu, menuRef);
 
   const socials = contact.socials;
   const active = navGroups.find((g) => g.label === openGroup) ?? null;
@@ -196,6 +207,7 @@ export default function SiteNavigation() {
             className="flex h-11 w-11 flex-col items-center justify-center gap-[7px] lg:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
+            aria-controls="mobile-menu"
           >
             <span
               className={`h-px w-7 bg-paper transition-transform duration-300 ${
@@ -296,7 +308,13 @@ export default function SiteNavigation() {
         {open ? (
           <motion.div
             key="menu"
-            className="fixed inset-0 z-[75] flex flex-col bg-coal/97 px-6 pt-24 pb-8 backdrop-blur-xl lg:hidden"
+            id="mobile-menu"
+            ref={menuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            tabIndex={-1}
+            className="fixed inset-0 z-[75] flex flex-col bg-coal/97 px-6 pt-24 pb-8 backdrop-blur-xl lg:hidden outline-none"
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}

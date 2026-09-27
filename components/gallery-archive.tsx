@@ -15,6 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { wix } from "@/lib/media";
+import { useDialog } from "@/lib/use-dialog";
 import { galleryCategories } from "@/content/platform";
 import type { GalleryItem } from "@/content/platform";
 
@@ -32,6 +33,7 @@ export default function GalleryArchive({
   const isReduced = useReducedMotion();
   const gridRef = useRef<HTMLUListElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const lightboxRef = useRef<HTMLElement | null>(null);
 
   const visible = useMemo(
     () => (filter === "all" ? items : items.filter((i) => i.category === filter)),
@@ -82,21 +84,21 @@ export default function GalleryArchive({
     [visible.length],
   );
 
+  /* Escape, focus trap, focus restore and scroll lock: the shared modal
+     contract. The arrow keys stay local to the gallery. */
+  useDialog(openIndex !== null, close, lightboxRef);
+
   useEffect(() => {
     if (openIndex === null) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
     };
     window.addEventListener("keydown", onKey);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previous;
     };
-  }, [openIndex, close, step]);
+  }, [openIndex, step]);
 
   return (
     <section className="bg-ink pb-20 md:pb-28">
@@ -188,9 +190,11 @@ export default function GalleryArchive({
               exit={isReduced ? undefined : { opacity: 0 }}
             />
             <motion.figure
+              ref={lightboxRef}
               role="dialog"
               aria-modal="true"
               aria-label={active.title}
+              tabIndex={-1}
               className="relative z-10 flex max-h-full w-full max-w-4xl flex-col"
               initial={isReduced ? false : { opacity: 0, scale: 0.97 }}
               animate={isReduced ? undefined : { opacity: 1, scale: 1 }}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import { motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
+import SectionLink from "./ui/section-link";
 import MediaReveal from "./ui/media-reveal";
 import MagneticButton from "./ui/magnetic-button";
 import { useScrollTo, NAVIGATE_EVENT } from "./smooth-scroll";
@@ -254,7 +255,6 @@ export default function AcademySection() {
               key={`${track.key}-${item.no}`}
               item={item}
               index={i}
-              onEnquire={() => scrollTo("#contact")}
             />
           ))}
         </motion.div>
@@ -345,11 +345,9 @@ export default function AcademySection() {
 function AcademyCard({
   item,
   index,
-  onEnquire,
 }: {
   item: AcademyItem;
   index: number;
-  onEnquire: () => void;
 }) {
   return (
     <motion.article
@@ -412,14 +410,16 @@ function AcademyCard({
           <Arrow />
         </MagneticButton>
 
-        <button
-          type="button"
-          onClick={onEnquire}
+        {/* A route, not a scroll. This section renders on both / and /academy,
+            and only the homepage has a `#contact` — on /academy this was a
+            button that did nothing. */}
+        <SectionLink
+          href="/contact"
           data-cursor="link"
-          className="font-mono text-[0.56rem] uppercase tracking-[0.22em] text-mute underline decoration-line underline-offset-4 transition-colors hover:text-bone"
+          className="self-start font-mono text-[0.56rem] uppercase tracking-[0.22em] text-mute underline decoration-line underline-offset-4 transition-colors hover:text-bone"
         >
           Or contact John
-        </button>
+        </SectionLink>
       </div>
     </motion.article>
   );

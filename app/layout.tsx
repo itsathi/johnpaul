@@ -11,7 +11,9 @@ import { artist, seo } from "@/content/site";
 import { CommerceProvider } from "@/lib/providers/commerce-provider";
 import { AcademyProvider } from "@/lib/providers/academy-provider";
 import { BookingProvider } from "@/lib/providers/booking-provider";
+import { AudioProvider } from "@/lib/providers/audio-provider";
 import CartDrawer from "@/components/cart-drawer";
+import PersistentPlayer from "@/components/player/persistent-player";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -103,16 +105,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CommerceProvider>
           <AcademyProvider>
             <BookingProvider>
-              <Preloader />
-              <SmoothScroll>
-                <CustomCursor />
-                <ScrollProgress />
-                <SiteNavigation />
-                <div className="film-grain" aria-hidden />
-                <main>{children}</main>
-                <Footer />
-                <CartDrawer />
-              </SmoothScroll>
+              {/* Audio sits outermost of the three so the transport outlives
+                  every route change, and the player is mounted here — above
+                  <main>, not inside a page — for the same reason. */}
+              <AudioProvider>
+                <Preloader />
+                <SmoothScroll>
+                  <CustomCursor />
+                  <ScrollProgress />
+                  <SiteNavigation />
+                  <div className="film-grain" aria-hidden />
+                  <main>{children}</main>
+                  <Footer />
+                  <CartDrawer />
+                  <PersistentPlayer />
+                </SmoothScroll>
+              </AudioProvider>
             </BookingProvider>
           </AcademyProvider>
         </CommerceProvider>

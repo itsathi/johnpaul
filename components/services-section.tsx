@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import SectionTag from "./ui/section-tag";
 import MagneticButton from "./ui/magnetic-button";
-import { useScrollTo } from "./smooth-scroll";
+import SectionLink from "./ui/section-link";
 import { collaborations, services, studioStatement } from "@/content/site";
 import { sessions } from "@/content/platform";
 
@@ -27,7 +27,6 @@ const bookingHref = `mailto:${EMAIL}?subject=${encodeURIComponent(sessions.cta.s
  * no booking system exists in this build and the demo shouldn't imply one.
  */
 export default function SessionsSection() {
-  const { scrollTo } = useScrollTo();
 
   return (
     <section id="sessions" className="relative overflow-hidden bg-ink py-28 md:py-44">
@@ -61,15 +60,14 @@ export default function SessionsSection() {
               {sessions.intro}
             </p>
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => scrollTo("#contact")}
+              <SectionLink
+                href="/contact"
                 data-cursor="link"
                 className="group inline-flex min-h-12 items-center gap-3 rounded-full border border-paper/30 px-6 py-3 font-mono text-[0.6rem] uppercase tracking-[0.24em] text-paper transition-colors hover:border-brass hover:text-brass-bright"
               >
                 {sessions.secondary.label}
                 <Arrow />
-              </button>
+              </SectionLink>
             </div>
           </div>
         </div>
@@ -95,15 +93,14 @@ export default function SessionsSection() {
                 {s.name}
               </h3>
               <p className="max-w-md text-sm leading-relaxed text-bone">{s.body}</p>
-              <button
-                type="button"
-                onClick={() => scrollTo("#contact")}
+              <SectionLink
+                href="/contact"
                 className="hidden h-12 w-12 items-center justify-center rounded-full border border-line transition-all duration-300 group-hover:border-brass group-hover:bg-brass/10 md:flex"
                 aria-label={`Enquire about ${s.name}`}
                 data-cursor="link"
               >
                 <Arrow />
-              </button>
+              </SectionLink>
             </motion.div>
           ))}
         </div>
@@ -189,15 +186,14 @@ export default function SessionsSection() {
             >
               Selected studio credits
             </h3>
-            <button
-              type="button"
-              onClick={() => scrollTo("#collab")}
+            <SectionLink
+              href="/music#collab"
               data-cursor="link"
               className="group inline-flex items-center gap-3 font-mono text-[0.58rem] uppercase tracking-[0.24em] text-mute transition-colors hover:text-brass-bright"
             >
               Full call list
               <Arrow />
-            </button>
+            </SectionLink>
           </div>
 
           <ul className="mt-2">

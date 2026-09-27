@@ -153,7 +153,10 @@ export default function LiveSection() {
     <section
       id="live"
       ref={sectionRef}
-      className="relative overflow-hidden bg-coal lg:h-[100svh]"
+      /* `100svh` is only right when the pinned stage is filling the viewport.
+         With reduced motion the section is a normal document flow, and pinning
+         its height would leave a screenful of emptiness. */
+      className={`relative overflow-hidden bg-coal ${reduced ? "" : "lg:h-[100svh]"}`}
     >
       {/* Giant drifting outline word (desktop) */}
       <div
@@ -245,8 +248,15 @@ export default function LiveSection() {
         </div>
       )}
 
-      {/* Mobile / tablet: stacked vertical gallery */}
-      <div className="py-28 md:py-36 lg:hidden">
+      {/* Mobile / tablet: stacked vertical gallery.
+
+          ALSO the reduced-motion path on desktop. The gate is
+          `lg:hidden` only when the pinned stage is actually going to render —
+          under `prefers-reduced-motion` it is not, so the stack has to take the
+          full width. Without this, a reduced-motion visitor at 1280px got the
+          outline word and nothing else: no headline, no statement, no
+          photographs, no tickets link. */}
+      <div className={`py-28 md:py-36 ${reduced ? "" : "lg:hidden"}`}>
         <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10">
           <SectionTag index="06" label="Live" />
           <h2

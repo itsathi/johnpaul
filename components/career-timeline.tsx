@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionTag from "./ui/section-tag";
+import SectionLink from "./ui/section-link";
 import MediaReveal from "./ui/media-reveal";
 import { journey } from "@/content/site";
 import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hooks";
@@ -176,13 +177,17 @@ export default function CareerTimeline() {
 
             <div className="ml-1 border-t border-line pt-6 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-mute">
               …and the next scene is{" "}
-              <a
-                href="#kalpana"
+              {/* A route, not a bare `#kalpana`. This timeline renders only on
+                  /artist/journey, where no `#kalpana` exists — the section
+                  lives on / and /music. SectionLink resolves it in either
+                  case. */}
+              <SectionLink
+                href="/music#kalpana"
                 className="text-brass-bright underline-offset-4 hover:underline"
                 data-cursor="link"
               >
                 Kalpana
-              </a>
+              </SectionLink>
               .
             </div>
           </div>

@@ -8,54 +8,23 @@
  * Focus is trapped while open and returned to the trigger on close.
  */
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCart } from "@/lib/providers/commerce-provider";
 import PlaceholderArt from "./ui/placeholder-art";
+import { useDialog } from "@/lib/use-dialog";
 
 export default function CartDrawer() {
   const { lines, count, opened, close, remove, setQuantity, subtotal, isPriced } = useCart();
   const isReduced = useReducedMotion();
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const closeRef = useRef<HTMLButtonElement | null>(null);
-  const restoreTo = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
-    if (!opened) return;
-    restoreTo.current = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+  /* Escape, the focus trap, focus restore and the scroll lock all come from
+     the shared modal contract — see lib/use-dialog.ts for why the hand-rolled
+     version of this was only ever half right. */
+  useDialog(opened, close, panelRef);
 
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        close();
-        return;
-      }
-      if (e.key !== "Tab") return;
-      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusables?.length) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previousOverflow;
-      restoreTo.current?.focus?.();
-    };
-  }, [opened, close]);
 
   return (
     <AnimatePresence>
@@ -75,6 +44,7 @@ export default function CartDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label="Cart"
+            tabIndex={-1}
             className="absolute inset-y-0 right-0 flex w-full max-w-[27rem] flex-col border-l border-line bg-coal"
             initial={isReduced ? false : { x: "100%" }}
             animate={isReduced ? undefined : { x: 0 }}
@@ -86,7 +56,6 @@ export default function CartDrawer() {
                 Cart {count > 0 ? <span className="text-brass">({count})</span> : null}
               </h2>
               <button
-                ref={closeRef}
                 type="button"
                 onClick={close}
                 data-cursor="link"

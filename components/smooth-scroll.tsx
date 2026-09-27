@@ -19,6 +19,22 @@ gsap.registerPlugin(ScrollTrigger);
 
 type ScrollContextValue = {
   scrollTo: (target: string | number, offset?: number) => void;
+  /**
+   * Freeze page scrolling while an overlay owns the screen.
+   *
+   * `document.body.style.overflow = "hidden"` is not enough here, and this is
+   * the reason it is not: when Lenis is running, the page is scrolled by
+   * transforming `window` on a rAF loop. The body has no scrollable overflow
+   * left to hide, so the wheel went straight through — the page scrolled
+   * *behind* the cart drawer and behind the gallery lightbox while the overlay
+   * sat still on top. Lenis has to be told to stop.
+   *
+   * Ref-counted because two overlays can legitimately want the lock at once,
+   * and the first one to close must not hand back the screen while the second
+   * is still open.
+   */
+  lockScroll: () => void;
+  unlockScroll: () => void;
 };
 
 /**
@@ -30,9 +46,28 @@ export const NAVIGATE_EVENT = "jp:navigate";
 
 const ScrollContext = createContext<ScrollContextValue>({
   scrollTo: () => {},
+  lockScroll: () => {},
+  unlockScroll: () => {},
 });
 
 export const useScrollTo = () => useContext(ScrollContext);
+
+/**
+ * The scroll lock, as a hook.
+ *
+ * `true` freezes the page for as long as the component is mounted with the
+ * lock engaged, and releases it on unmount. Pairs with the `Escape` and
+ * focus-trap handling an overlay already needs, so an overlay gets the whole
+ * modal contract from one call.
+ */
+export function useScrollLock(locked: boolean) {
+  const { lockScroll, unlockScroll } = useContext(ScrollContext);
+  useEffect(() => {
+    if (!locked) return;
+    lockScroll();
+    return unlockScroll;
+  }, [locked, lockScroll, unlockScroll]);
+}
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion();
@@ -125,7 +160,33 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     };
   }, [pathname, reduced]);
 
-  const value = useMemo(() => ({ scrollTo }), [scrollTo]);
+  /* ---- the overlay lock ---- */
+
+  const locks = useRef(0);
+
+  const lockScroll = useCallback(() => {
+    locks.current += 1;
+    if (locks.current > 1) return;
+    // Lenis owns the wheel when it is running, so it is the thing that has to
+    // stop. `stop()` also adds Lenis's own `lenis-stopped` class to <html>,
+    // which the stylesheet already turns into `overflow: hidden`.
+    lenisRef.current?.stop();
+    // When Lenis is not running (reduced motion, or a coarse pointer) the
+    // native document scroll is the real one, so hide its overflow too.
+    document.body.style.overflow = "hidden";
+  }, []);
+
+  const unlockScroll = useCallback(() => {
+    locks.current = Math.max(0, locks.current - 1);
+    if (locks.current > 0) return;
+    lenisRef.current?.start();
+    document.body.style.overflow = "";
+  }, []);
+
+  const value = useMemo(
+    () => ({ scrollTo, lockScroll, unlockScroll }),
+    [scrollTo, lockScroll, unlockScroll],
+  );
 
   return <ScrollContext.Provider value={value}>{children}</ScrollContext.Provider>;
 }

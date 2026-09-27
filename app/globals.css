@@ -165,3 +165,71 @@ body {
 .kinetic-pause:hover .animate-marquee-x {
   animation-play-state: paused;
 }
+
+/* ------------------------------------------------------------------ */
+/* Player range inputs                                                */
+/*                                                                     */
+/* A real <input type="range"> underneath the waveform, so touch,       */
+/* keyboard and assistive tech all work with no custom pointer code.   */
+/* The track is transparent — the canvas waveform *is* the visual — so  */
+/* only the thumb is styled, and it appears on interaction rather than  */
+/* sitting there permanently.                                           */
+/* ------------------------------------------------------------------ */
+
+.jp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+.jp-range::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+.jp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -1px;
+  border-radius: 9999px;
+  background: var(--color-brass-bright);
+  box-shadow: 0 0 0 4px rgba(217, 170, 110, 0.18);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.jp-range:hover::-webkit-slider-thumb,
+.jp-range:focus-visible::-webkit-slider-thumb,
+.jp-range:active::-webkit-slider-thumb {
+  opacity: 1;
+}
+.jp-range::-moz-range-track {
+  height: 100%;
+  background: transparent;
+}
+.jp-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-brass-bright);
+  box-shadow: 0 0 0 4px rgba(217, 170, 110, 0.18);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.jp-range:hover::-moz-range-thumb,
+.jp-range:focus-visible::-moz-range-thumb,
+.jp-range:active::-moz-range-thumb {
+  opacity: 1;
+}
+
+/* The filled portion of the volume slider, drawn as a background gradient so
+   it tracks the value without a second element. */
+.jp-range-filled {
+  background-image: linear-gradient(
+    to right,
+    var(--color-brass) 0%,
+    var(--color-brass) var(--fill, 0%),
+    rgba(236, 230, 218, 0.14) var(--fill, 0%),
+    rgba(236, 230, 218, 0.14) 100%
+  );
+}
