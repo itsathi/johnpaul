@@ -33,7 +33,13 @@ function enquiry(subject: string) {
  * not supplied them. Enquiry links go to a real mailbox rather than a booking
  * form, so nothing here pretends to a system that does not exist.
  */
-export default function AcademySection() {
+export default function AcademySection({
+  index = "14",
+  label = academy.kicker,
+}: {
+  index?: string;
+  label?: string;
+} = {}) {
   const { scrollTo } = useScrollTo();
   const [active, setActive] = useState(academy.tracks[0].key);
 
@@ -113,7 +119,7 @@ export default function AcademySection() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="14" label={academy.kicker} />
+        <SectionTag index={index} label={label} />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-end lg:gap-20">
           <h2

@@ -25,11 +25,17 @@ import { nowPlaying } from "@/content/site";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-export default function NowPlaying() {
+export default function NowPlaying({
+  index = "03",
+  label = nowPlaying.kicker,
+}: {
+  index?: string;
+  label?: string;
+} = {}) {
   return (
     <section id="listen" className="relative bg-ink pt-20 md:pt-28">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="03" label={nowPlaying.kicker} />
+        <SectionTag index={index} label={label} />
 
         <div className="mt-14 grid items-end gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
           <motion.div

@@ -19,7 +19,13 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  * nothing here is stock filler, and items that arrive without an image fall
  * back to `Media`'s on-brand placeholder.
  */
-export default function GallerySection() {
+export default function GallerySection({
+  index = "15",
+  label = gallery.kicker,
+}: {
+  index?: string;
+  label?: string;
+} = {}) {
   const [filter, setFilter] = useState("all");
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -56,7 +62,7 @@ export default function GallerySection() {
   return (
     <section id="gallery" className="relative overflow-hidden bg-coal py-28 md:py-40">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="15" label={gallery.kicker} />
+        <SectionTag index={index} label={label} />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-end lg:gap-20">
           <h2

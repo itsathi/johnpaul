@@ -24,9 +24,13 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export default function ShopSection({
   products,
   source,
+  index = "16",
+  label = shop.kicker,
 }: {
   products: Product[];
   source: "mock" | "storefront";
+  index?: string;
+  label?: string;
 }) {
   const [filter, setFilter] = useState("all");
 
@@ -45,7 +49,7 @@ export default function ShopSection({
   return (
     <section id="shop" className="relative overflow-hidden bg-ink py-28 md:py-40">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="16" label={shop.kicker} />
+        <SectionTag index={index} label={label} />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-end lg:gap-20">
           <h2

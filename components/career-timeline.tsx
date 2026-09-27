@@ -17,7 +17,13 @@ import { journey } from "@/content/site";
  *
  * This section is mounted on the homepage as well as on `/artist/journey`.
  */
-export default function CareerTimeline() {
+export default function CareerTimeline({
+  index = "11",
+  label = "The journey",
+}: {
+  index?: string;
+  label?: string;
+} = {}) {
   const items: TimelineItem[] = journey.map((item, i) => ({
     eyebrow: (
       <span className="flex flex-wrap items-baseline gap-x-5">
@@ -63,7 +69,7 @@ export default function CareerTimeline() {
       <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.75fr] lg:gap-20">
           <div className="lg:sticky lg:top-32 lg:self-start">
-            <SectionTag index="11" label="The journey" />
+            <SectionTag index={index} label={label} />
             <p
               className="mt-10 font-display leading-[1.02] tracking-[-0.02em] text-paper"
               style={{ fontSize: "clamp(2.4rem, 5vw, 4.6rem)" }}

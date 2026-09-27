@@ -1,50 +1,71 @@
 import Hero from "@/components/hero";
-import EcosystemSection from "@/components/ecosystem-section";
 import NowPlaying from "@/components/now-playing";
 import KalpanaSection from "@/components/kalpana-section";
-import LiveMarqueeSection from "@/components/live-marquee-section";
-import CareerTimeline from "@/components/career-timeline";
-import AcademySection from "@/components/academy-section";
-import GallerySection from "@/components/gallery-section";
 import ShopSection from "@/components/shop-section";
-import NewsletterSection from "@/components/newsletter-section";
-import ContactSection from "@/components/contact-section";
+import AcademySection from "@/components/academy-section";
+import ServicesSection from "@/components/services-section";
+import LiveCollabSection from "@/components/live-collab-section";
+import CareerTimeline from "@/components/career-timeline";
+import GallerySection from "@/components/gallery-section";
+import FinalCtaSection from "@/components/final-cta-section";
 import { getCatalog } from "@/lib/commerce";
 
 /**
- * The homepage is the cinematic *entry point*, not the whole platform.
- *
- * It keeps the strongest moments — the halftone hero, the ecosystem
- * constellation, what is playing, Kalpana, the journey, the academy, the
- * archive, the shop and the door — and drops the sections that were doing
- * detailed work. Those did not disappear: the discography, live archive,
- * collaborations, studio, instruments, Kolkata roots, services, support and
- * the sound lab now live on their own routes, and the ecosystem constellation
- * above points straight at them.
- *
- * Section numbering is global to the platform rather than sequential per page,
- * so the tags stay in ascending order even with a section skipped: 01, 03, 05,
- * 06, 11, 14, 15, 16, 18.
- *
- * The catalogue is still resolved on the server so the storefront renders
- * already shaped the way a real commerce integration would feed it.
+ * Strategic 10-Step Narrative Funnel:
+ * 01. HERO — Immediate identity + primary actions
+ * 02. NOW PLAYING / LATEST RELEASE — Give me a reason to listen
+ * 03. MUSIC / LATEST WORK — Turn visitor into a fan
+ * 04. SHOP / MERCH — Monetize the fan
+ * 05. ACADEMY — Monetize the learner
+ * 06. WORK WITH JOHN — Monetize the professional opportunity
+ * 07. LIVE / COLLABORATIONS — Build credibility + social proof
+ * 08. THE ARTIST / STORY — Emotional connection
+ * 09. GALLERY / ARCHIVE — Deeper exploration
+ * 10. FINAL CTA — Listen / Learn / Shop / Work With John
  */
 export default async function Home() {
   const catalog = await getCatalog();
 
   return (
     <>
+      {/* 01. HERO — Immediate identity + primary actions */}
       <Hero />
-      <EcosystemSection />
-      <NowPlaying />
-      <KalpanaSection />
-      <LiveMarqueeSection />
-      <CareerTimeline />
-      <AcademySection />
-      <GallerySection />
-      <ShopSection products={catalog.products} source={catalog.source} />
-      <NewsletterSection />
-      <ContactSection />
+
+      {/* 02. NOW PLAYING / LATEST RELEASE — Give me a reason to listen */}
+      <NowPlaying index="02" label="Now playing — latest release" />
+
+      {/* 03. MUSIC / LATEST WORK — Turn visitor into a fan */}
+      <KalpanaSection index="03" label="Music — latest work" />
+
+      {/* 04. SHOP / MERCH — Monetize the fan */}
+      <ShopSection
+        products={catalog.products}
+        source={catalog.source}
+        index="04"
+        label="Shop — merchandise"
+      />
+
+      {/* 05. ACADEMY — Monetize the learner */}
+      <AcademySection index="05" label="Academy — learn from John" />
+
+      {/* 06. WORK WITH JOHN — Monetize the professional opportunity */}
+      <ServicesSection
+        index="06"
+        label="Work with John — professional services"
+        headlineLines={["Work with John.", "Live, studio,", "record or project."]}
+      />
+
+      {/* 07. LIVE / COLLABORATIONS — Build credibility + social proof */}
+      <LiveCollabSection index="07" label="Live & Collaborations — social proof" />
+
+      {/* 08. THE ARTIST / STORY — Emotional connection */}
+      <CareerTimeline index="08" label="The Artist — story & journey" />
+
+      {/* 09. GALLERY / ARCHIVE — Deeper exploration */}
+      <GallerySection index="09" label="Gallery — visual archive" />
+
+      {/* 10. FINAL CTA — Listen / Learn / Shop / Work With John */}
+      <FinalCtaSection index="10" label="Final CTA — Four Doors" />
     </>
   );
 }

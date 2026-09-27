@@ -11,7 +11,13 @@ import { useIsPrecisionPointer, usePrefersReducedMotion } from "@/lib/media-hook
 gsap.registerPlugin(ScrollTrigger);
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-export default function KalpanaSection() {
+export default function KalpanaSection({
+  index = "05",
+  label = "Kalpana — the album",
+}: {
+  index?: string;
+  label?: string;
+} = {}) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const lettersRef = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
@@ -68,7 +74,7 @@ export default function KalpanaSection() {
       </div>
 
       <div className="relative mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="05" label="Kalpana — the album" />
+        <SectionTag index={index} label={label} />
 
         <div className="mt-24 grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           {/* Artwork */}

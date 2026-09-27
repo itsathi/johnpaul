@@ -26,19 +26,27 @@ const bookingHref = `mailto:${EMAIL}?subject=${encodeURIComponent(sessions.cta.s
  * selected studio credits. Enquiry is a real email rather than a form, because
  * no booking system exists in this build and the demo shouldn't imply one.
  */
-export default function SessionsSection() {
+export default function SessionsSection({
+  index = "13",
+  label = sessions.kicker,
+  headlineLines = sessions.headline,
+}: {
+  index?: string;
+  label?: string;
+  headlineLines?: string[];
+} = {}) {
 
   return (
     <section id="sessions" className="relative overflow-hidden bg-ink py-28 md:py-44">
       <div className="mx-auto w-full max-w-[92rem] px-6 md:px-10 lg:px-14">
-        <SectionTag index="13" label={sessions.kicker} />
+        <SectionTag index={index} label={label} />
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-end lg:gap-20">
           <h2
             className="font-display leading-[0.94] tracking-[-0.02em] text-paper"
             style={{ fontSize: "clamp(2.4rem, 6.4vw, 6rem)" }}
           >
-            {sessions.headline.map((line, i) => (
+            {headlineLines.map((line, i) => (
               <span key={line} className="block overflow-hidden">
                 <motion.span
                   className={`block will-change-transform ${
