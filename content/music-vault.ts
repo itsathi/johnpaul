@@ -10,11 +10,12 @@
  *   COLLABORATIONS   the documented call list
  *
  * ── THE HONEST PART, READ THIS BEFORE EDITING ───────────────────────────────
- * `src` is the seam. It is `null` everywhere, because no audio file for any of
- * this work has been supplied. The player does not pretend otherwise: a track
- * with a `null` `src` runs a transport whose clock is simulated, and the UI
- * labels it as such wherever the transport is visible. Supplying a real file is
- * one field — no component, provider or engine change:
+ * `src` is the seam. It currently points every track at a single supplied demo
+ * file (`/public/charger solo.wav`), so pressing play produces real audio. The
+ * player still handles a `null` `src`: such a track runs a transport whose clock
+ * is simulated, and the UI labels it as such wherever the transport is visible.
+ * Supplying a different file per track is one field — no component, provider or
+ * engine change:
  *
  *   src: "https://cdn.example.com/kalpana/01-yosemites-hathi.mp3"
  *
@@ -34,6 +35,13 @@
 import { collaborations, kalpana, liveShots, nowPlaying } from "./site";
 import { releases } from "./releases";
 import type { Source } from "./platform";
+
+/**
+ * The supplied demo audio. One file currently stands in for every vault track
+ * so the player plays real sound; point a track's `src` at its own file when one
+ * exists.
+ */
+const TRACK_AUDIO = "/charger%20solo.wav";
 
 /** A playable item. One shape for all three rooms. */
 export type VaultTrack = {
@@ -92,7 +100,7 @@ const solo: VaultTrack[] = [
     artwork: kalpanaRelease.artwork,
     artworkWix: true,
     artworkAlt: "Album artwork for Kalpana by John Paul",
-    src: null,
+    src: TRACK_AUDIO,
     demoSeconds: 268,
     streams: kalpanaRelease.streams,
     href: "/music/kalpana",
@@ -107,7 +115,7 @@ const solo: VaultTrack[] = [
     artwork: hathiRelease.artwork,
     artworkWix: false,
     artworkAlt: "Artwork for Yosemite's Hathi by John Paul",
-    src: null,
+    src: TRACK_AUDIO,
     demoSeconds: 254,
     streams: hathiRelease.streams,
     href: "/music/yosemites-hathi",
@@ -131,7 +139,7 @@ const live: VaultTrack[] = [
     artwork: liveShots[2].id,
     artworkWix: true,
     artworkAlt: "John Paul performing with his own band at 5 Mad Men, Kolkata",
-    src: null,
+    src: TRACK_AUDIO,
     demoSeconds: 241,
     streams: [
       { label: "Instagram", href: "https://www.instagram.com/johnpaul.india/", note: "Live updates" },
@@ -148,7 +156,7 @@ const live: VaultTrack[] = [
     artwork: liveShots[4].id,
     artworkWix: true,
     artworkAlt: "John Paul performing live, close up under stage light",
-    src: null,
+    src: TRACK_AUDIO,
     demoSeconds: 232,
     streams: [
       { label: "YouTube", href: nowPlaying.premiere.href, note: "Live at AAM Mumbai" },
@@ -167,7 +175,7 @@ const live: VaultTrack[] = [
     artwork: liveShots[5].id,
     artworkWix: true,
     artworkAlt: "John Paul performing on tour around the country",
-    src: null,
+    src: TRACK_AUDIO,
     demoSeconds: 226,
     streams: [
       { label: "Instagram", href: "https://www.instagram.com/johnpaul.india/", note: "Tour updates" },
@@ -201,7 +209,7 @@ function collabTrack(index: number): VaultTrack {
     artworkAlt: c.media
       ? `John Paul performing with ${c.name}`
       : `Documentation of ${c.name} work — strings and studio detail`,
-    src: null,
+    src: TRACK_AUDIO,
     demoSeconds: 214 + ((index * 17) % 46),
     streams: [
       { label: "Instagram", href: "https://www.instagram.com/johnpaul.india/", note: `Work with ${c.name}` },
@@ -277,5 +285,5 @@ export const vaultCopy = {
   intro:
     "Three rooms. His own records, his own stage, and the call list he has spent a decade answering. Press play and the player follows you for the rest of the site.",
   note:
-    "The player is wired to real audio files. None have been supplied yet, so pressing play starts a clearly-marked demo transport — the streaming links on every track are the real way in.",
+    "The player is wired to real audio and currently uses a single supplied demo file across the vault. Where a track has its own recording, the streaming links on it remain the definitive way in.",
 } as const;

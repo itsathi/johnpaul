@@ -96,6 +96,8 @@ class AudioEngine {
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private sourceNode: MediaElementAudioSourceNode | null = null;
+  private gainNode: GainNode | null = null;
+  private currentSrc: string | null = null;
   private graphTried = false;
 
   private snapshot: EngineSnapshot = IDLE;
@@ -195,12 +197,10 @@ class AudioEngine {
   /* ---------------------------------------------------------------- */
 
   /**
-   * Builds the visualiser graph, once, and never lets it break playback.
+   * Builds the visualiser graph, once, and routes it to destination so audio plays.
    *
-   * The element is intentionally left connected to the destination as well —
-   * audio is heard through the element's own path, and the analyser is a
-   * parallel tap. A cross-origin source that refuses to feed the graph then
-   * costs the visualiser nothing and costs playback nothing.
+   * The element's audio is routed through the MediaElementAudioSourceNode to the AnalyserNode,
+   * then through a GainNode to the AudioDestinationNode (speakers).
    */
   private ensureAnalyser(): AnalyserNode | null {
     if (this.analyser) return this.analyser;
@@ -217,14 +217,39 @@ class AudioEngine {
       this.analyser = this.audioContext.createAnalyser();
       this.analyser.fftSize = 128;
       this.analyser.smoothingTimeConstant = 0.78;
+      this.gainNode = this.audioContext.createGain();
+      this.applyGain();
+
       this.sourceNode.connect(this.analyser);
-      // Deliberately NOT connecting analyser → destination. See the header.
+      this.analyser.connect(this.gainNode);
+      this.gainNode.connect(this.audioContext.destination);
+
       return this.analyser;
     } catch {
-      // No graph. The element still plays; the visualiser falls back.
+      // If Web Audio graph fails, keep element playing directly
       this.analyser = null;
       this.sourceNode = null;
+      this.gainNode = null;
       return null;
+    }
+  }
+
+  private applyGain() {
+    const targetGain = this.snapshot.muted ? 0 : this.snapshot.volume;
+    if (this.gainNode && this.audioContext) {
+      try {
+        this.gainNode.gain.setValueAtTime(targetGain, this.audioContext.currentTime);
+      } catch {
+        this.gainNode.gain.value = targetGain;
+      }
+    }
+    if (this.element) {
+      try {
+        this.element.volume = this.snapshot.volume;
+        this.element.muted = this.snapshot.muted;
+      } catch {
+        /* ignore */
+      }
     }
   }
 
@@ -295,19 +320,21 @@ class AudioEngine {
 
     if (track.src) {
       const el = this.getElement();
-      if (el.src !== track.src) {
+      if (this.currentSrc !== track.src) {
+        this.currentSrc = track.src;
         el.src = track.src;
         el.load();
       }
       this.emit({
         trackId: track.id,
         status: "loading",
-        currentTime: 0,
-        duration: 0,
+        currentTime: sameTrack ? el.currentTime : 0,
+        duration: Number.isFinite(el.duration) ? el.duration : 0,
         simulated: false,
         error: null,
       });
       this.ensureAnalyser();
+      this.applyGain();
       if (autoplay || resume) void this.play();
       return true;
     }
@@ -334,13 +361,16 @@ class AudioEngine {
     if (track.src) {
       const el = this.getElement();
       this.ensureAnalyser();
+      this.applyGain();
       this.emit({ status: "playing", error: null });
       try {
-        await el.play();
         await this.resumeContext();
-      } catch {
-        // Autoplay policy or a dead URL. The element will have raised `error`
-        // for the latter; this covers the former and the "no supported source".
+        if (el.ended || (Number.isFinite(el.duration) && el.duration > 0 && el.currentTime >= el.duration)) {
+          el.currentTime = 0;
+        }
+        await el.play();
+      } catch (err) {
+        console.error("Audio playback error:", err);
         this.emit({
           status: "error",
           error: "This track could not be played here. Use the streaming links to hear the real recording.",
@@ -383,6 +413,7 @@ class AudioEngine {
     } else if (this.element) {
       try {
         this.element.currentTime = next;
+        this.emit({ currentTime: next });
       } catch {
         /* Seeking before metadata is ready is not an error worth surfacing. */
       }
@@ -391,13 +422,16 @@ class AudioEngine {
 
   setVolume(next: number) {
     const value = clamp01(next);
-    if (this.element) this.element.volume = value;
-    this.emit({ volume: value, muted: value === 0 ? this.snapshot.muted : false });
+    this.snapshot.volume = value;
+    if (value > 0) this.snapshot.muted = false;
+    this.applyGain();
+    this.emit({ volume: value, muted: this.snapshot.muted });
   }
 
   toggleMute() {
     const muted = !this.snapshot.muted;
-    if (this.element) this.element.muted = muted;
+    this.snapshot.muted = muted;
+    this.applyGain();
     this.emit({ muted });
   }
 
@@ -409,6 +443,7 @@ class AudioEngine {
       this.element.removeAttribute("src");
       this.element.load();
     }
+    this.currentSrc = null;
     this.track = null;
     this.emit({ ...IDLE, volume: this.snapshot.volume, muted: this.snapshot.muted });
   }
