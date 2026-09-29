@@ -6,6 +6,7 @@ import SiteNavigation from "@/components/site-navigation";
 import CustomCursor from "@/components/custom-cursor";
 import ScrollProgress from "@/components/scroll-progress";
 import Preloader from "@/components/preloader";
+import PageTransition from "@/components/page-transition";
 import Footer from "@/components/footer";
 import { artist, seo } from "@/content/site";
 import { CommerceProvider } from "@/lib/providers/commerce-provider";
@@ -120,7 +121,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   <ScrollProgress />
                   <SiteNavigation />
                   <div className="film-grain" aria-hidden />
-                  <main>{children}</main>
+                  <PageTransition>
+                    <main>{children}</main>
+                  </PageTransition>
                   <Footer />
                   <CartDrawer />
                   <PersistentPlayer />

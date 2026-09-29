@@ -1,3 +1,4 @@
+import CinematicPreloader from "@/components/cinematic-preloader";
 import Hero from "@/components/hero";
 import NowPlaying from "@/components/now-playing";
 import KalpanaSection from "@/components/kalpana-section";
@@ -28,8 +29,10 @@ export default async function Home() {
 
   return (
     <>
-      {/* 01. HERO — Immediate identity + primary actions */}
-      <Hero />
+      <CinematicPreloader />
+      <main>
+        {/* 01. HERO — Immediate identity + primary actions */}
+        <Hero />
 
       {/* 02. NOW PLAYING / LATEST RELEASE — Give me a reason to listen */}
       <NowPlaying index="02" label="Now playing — latest release" />
@@ -65,7 +68,8 @@ export default async function Home() {
       <GallerySection index="09" label="Gallery — visual archive" />
 
       {/* 10. FINAL CTA — Listen / Learn / Shop / Work With John */}
-      <FinalCtaSection index="10" label="Final CTA — Four Doors" />
+        <FinalCtaSection index="10" label="Final CTA — Four Doors" />
+      </main>
     </>
   );
 }

@@ -56,23 +56,35 @@ export default function Hero() {
   }, [desktop, reduced]);
 
   const reveal = (delay: number) => ({
-    wait: { opacity: 0, y: 14 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.9, delay, ease: EASE } },
+    wait: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 1.2, delay, ease: EASE } },
   });
 
   const maskReveal = (delay: number) => ({
     wait: { y: "112%" },
     show: {
       y: "0%",
-      transition: { duration: 1.15, delay, ease: [0.22, 1, 0.36, 1] as const },
+      transition: { duration: 1.4, delay, ease: [0.22, 1, 0.36, 1] as const },
     },
   });
 
+  const heroReveal = {
+    wait: { opacity: 0, scale: 1.05 },
+    show: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 1.6, ease: [0.16, 1, 0.3, 1] as const },
+    },
+  };
+
   return (
-    <section
+    <motion.section
       id="top"
       ref={sectionRef}
       className="relative h-[100svh] min-h-[34rem] w-full overflow-hidden bg-ink sm:min-h-[620px]"
+      variants={heroReveal}
+      initial="wait"
+      animate={stage}
     >
       <div ref={imageRef} className="absolute inset-0 will-change-transform">
         <Media
@@ -233,7 +245,7 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
